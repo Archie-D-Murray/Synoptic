@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace AI.HSM {
-    [Serializable]
-    public class State {
+
+    public abstract class State {
         public readonly StateMachine StateMachine;
         public readonly State Parent;
         public State ActiveChild;
