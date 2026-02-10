@@ -50,9 +50,8 @@ namespace AI.HSM {
             AIStates Parent;
             List<AIStates> Children;
         }
+
         public void Init() {
-
-
             StateBuilder builder = new StateBuilder();
             int index = 0;
             foreach (AIStateView view in _array) {
@@ -65,6 +64,10 @@ namespace AI.HSM {
                     view.State = builder.Create(AIStates.None, null);
                 }
             }
+        }
+
+        private void GetDefaultTransitions() {
+
         }
     }
 }

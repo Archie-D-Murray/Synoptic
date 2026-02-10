@@ -15,8 +15,24 @@ namespace AI.HSM {
             Parent = parent;
         }
 
-        protected virtual State GetInitialState() { return null; }
-        protected virtual State GetTransition() { return null; }
+        protected virtual State GetInitialState() {
+            return StateMachine.InitialStates.GetValueOrDefault(this);
+        }
+
+        protected virtual State GetTransition() {
+            State transition = null;
+            foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions[this]) {
+                if (transitionCondition.Evaluate()) {
+                    transition = transitionCondition.To;
+                }
+            }
+            foreach (TransitionCondition transitionCondition in StateMachine.AnyStateTransition) {
+                if (transitionCondition.Evaluate()) {
+                    transition = transitionCondition.To;
+                }
+            }
+            return transition;
+        }
 
         protected virtual void OnEnter() { }
         protected virtual void OnFixedUpdate() { }
@@ -31,7 +47,7 @@ namespace AI.HSM {
         }
 
         public void Update(float deltaTime) {
-            State transition = GetTransition();
+            State transition = null;
             if (transition != null) {
                 StateMachine.ChangeState(this, transition);
                 return;

@@ -177,7 +177,7 @@ public static class Extensions {
 
     public static Quaternion RotationCardinalTo(this Vector2 origin, Vector2 point) {
         float angle = origin.AngleTo(point);
-        angle = (int)(Mathf.RoundToInt(angle < 0 ? 360 + angle : angle + 45) / 90) * 90;
+        angle = (int) (Mathf.RoundToInt(angle < 0 ? 360 + angle : angle + 45) / 90) * 90;
         return Quaternion.AngleAxis(angle, Vector3.forward);
     }
 

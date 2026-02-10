@@ -5,6 +5,9 @@ namespace AI.HSM {
     public class StateMachine {
         public readonly State Root;
         private bool _started = false;
+        public readonly Dictionary<State, State> InitialStates = new Dictionary<State, State>();
+        public readonly Dictionary<State, HashSet<TransitionCondition>> StateTransitions = new Dictionary<State, HashSet<TransitionCondition>>();
+        public readonly HashSet<TransitionCondition> AnyStateTransition = new HashSet<TransitionCondition>();
 
         public StateMachine(State root) {
             Root = root;
@@ -33,6 +36,22 @@ namespace AI.HSM {
             for (State state = to; state != lca; state = state.Parent) { toStack.Push(state); }
             while (toStack.Count > 0) { toStack.Pop().Enter(); }
         }
+
+        public void AddAnyTransition(State to, IPredicate condition) {
+            AnyStateTransition.Add(new TransitionCondition(to, condition));
+        }
+
+        public void AddStateTransition(State from, State to, IPredicate condition) {
+            AddState(from, new TransitionCondition(to, condition));
+        }
+
+        private void AddState(State from, TransitionCondition condition) {
+            if (StateTransitions.TryGetValue(from, out HashSet<TransitionCondition> transitions)) {
+                transitions.Add(condition);
+            } else {
+                StateTransitions.Add(from, new HashSet<TransitionCondition>() { condition });
+            }
+        }
     }
 
     public class StateMachineBuilder {
@@ -59,7 +78,7 @@ namespace AI.HSM {
             foreach (FieldInfo field in state.GetType().GetFields(flags)) { // Get all fields of type AIState
                 if (!typeof(State).IsAssignableFrom(field.FieldType)) { continue; }
                 if (field.Name == nameof(State.Parent)) { continue; } // No infinite recursion
-                State child = (State)field.GetValue(state);
+                State child = (State) field.GetValue(state);
                 if (child == null) { continue; }
                 if (!ReferenceEquals(child.Parent, state)) { continue; }
                 Wire(child, machine, visited); // Recurse over children
