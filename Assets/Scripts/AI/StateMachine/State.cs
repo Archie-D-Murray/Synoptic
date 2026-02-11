@@ -47,7 +47,7 @@ namespace AI.HSM {
         }
 
         public void Update(float deltaTime) {
-            State transition = null;
+            State transition = GetTransition();
             if (transition != null) {
                 StateMachine.ChangeState(this, transition);
                 return;
