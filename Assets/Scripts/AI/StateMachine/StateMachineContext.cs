@@ -24,7 +24,7 @@ namespace AI.HSM {
 
     [Serializable]
     public class StateMachineContext {
-        public MovementAdapter Adapter;
+        public MovementAdapter Movement;
         public StateMachine StateMachine;
 
         [SerializeField] private AIStateView[] _array;
