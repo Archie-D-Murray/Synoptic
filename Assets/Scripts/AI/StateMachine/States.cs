@@ -1,9 +1,9 @@
 using AI.HSM;
 
 namespace AI {
-    public enum AIStates { None, Idle, Wander, Patrol, Chase, Attack }
+    public enum AIState { None, Root, Idle, Wander, Patrol, Chase, Attack }
 
-    public class AIRootState : State {
-        public AIRootState(StateMachine stateMachine, State parent) : base(stateMachine, parent) { }
+    public class RootState : State {
+        public RootState(StateMachine stateMachine, State parent) : base(stateMachine, parent) { }
     }
 }

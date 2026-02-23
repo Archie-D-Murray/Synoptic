@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using AI.Adapters;
 using AI.HSM;
 
@@ -27,12 +29,11 @@ namespace AI.Injectors {
 
     public interface IChaseInjector : IStateInjector {
         public bool LostTarget();
-        public bool SwitchToLastAction();
         public bool SwitchToAttack();
     }
 
     public interface IAttackInjector : IStateInjector {
         public float GetAttackCooldown();
-        public void AddAttack(AttackData data);
+        public List<AttackAdapter> GetAttacks();
     }
 }

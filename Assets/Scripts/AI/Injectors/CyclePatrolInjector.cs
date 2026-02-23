@@ -20,8 +20,7 @@ namespace AI.Injectors {
             return _wanderPoints[_patrolIndex];
         }
 
-        public void OnEnter() {
-        }
+        public void OnEnter() { }
 
         public void OnExit() { }
 

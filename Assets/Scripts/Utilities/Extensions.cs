@@ -139,6 +139,10 @@ public static class Extensions {
         }
     }
 
+    public static bool InRange(this Vector3 delta, float range) {
+        return delta.sqrMagnitude <= (range * range);
+    }
+
     public static Vector3 ToXZ(this Vector2 vector) {
         return new Vector3(vector.x, 0, vector.y);
     }

@@ -15,6 +15,8 @@ namespace AI.Adapters {
 
     public class NullAttackAdapter : AttackAdapter {
 
-        public override void OnEvent(AnimationClip clip, AttackData data) { }
+        public override void OnEvent(AnimationClip clip, AttackData data) {
+            Debug.Log("[Attack Adapter]: Null attack called");
+        }
     }
 }

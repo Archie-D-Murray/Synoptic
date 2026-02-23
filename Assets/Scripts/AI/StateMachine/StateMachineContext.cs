@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AI.Adapters;
 
@@ -9,8 +10,8 @@ namespace AI.HSM {
 
     [Serializable]
     public class AIStateView {
-        public AIStates Key;
-        public AIStates Parent;
+        public AIState Key;
+        public AIState Parent;
         [HideInInspector]
         public State State = null;
     }
@@ -18,7 +19,7 @@ namespace AI.HSM {
     class StateNode {
         public StateNode Parent;
         public State Value;
-        public AIStates Type;
+        public AIState Type;
         public List<StateNode> Children;
     }
 
@@ -26,11 +27,12 @@ namespace AI.HSM {
     public class StateMachineContext {
         public MovementAdapter Movement;
         public StateMachine StateMachine;
+        public Transform Self;
 
         [SerializeField] private AIStateView[] _array;
-        private Dictionary<AIStates, int> _lookup = new Dictionary<AIStates, int>();
+        private Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
 
-        public State this[AIStates state] {
+        public State this[AIState state] {
             get {
                 if (_lookup.TryGetValue(state, out int index)) {
                     return _array[index].State;
@@ -46,24 +48,20 @@ namespace AI.HSM {
         }
 
         class StateNode {
-            AIStates State;
-            AIStates Parent;
-            List<AIStates> Children;
+            AIState State;
+            AIState Parent;
+            List<AIState> Children;
         }
 
         public void Init() {
-            StateBuilder builder = new StateBuilder();
+            StateFactory factory = new StateFactory(StateMachine, this);
             int index = 0;
             foreach (AIStateView view in _array) {
                 _lookup.Add(view.Key, index);
                 index++;
             }
 
-            foreach (AIStateView view in _array) {
-                if (view.Parent == AIStates.None) {
-                    view.State = builder.Create(AIStates.None, null);
-                }
-            }
+            // TODO: Use dependency resolving to handle this as a tree
         }
 
         private void GetDefaultTransitions() {
