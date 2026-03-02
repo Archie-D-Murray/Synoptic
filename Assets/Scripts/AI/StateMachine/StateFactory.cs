@@ -13,7 +13,7 @@ namespace AI.HSM {
 
         public State Create(AIState type, State parent = null) {
             return type switch {
-                AIState.None => new RootState(_stateMachine, null),
+                AIState.Root => new RootState(_stateMachine, null),
                 AIState.Idle => new IdleState(_context, _stateMachine, parent),
                 AIState.Wander => new WanderState(_context, _stateMachine, parent),
                 AIState.Patrol => new PatrolState(_context, _stateMachine, parent),

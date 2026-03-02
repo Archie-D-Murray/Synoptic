@@ -8,5 +8,9 @@ namespace AI {
         public IdleState(StateMachineContext context, StateMachine stateMachine, State parent) : base(stateMachine, parent) {
             _context = context;
         }
+
+        protected override void OnUpdate(float dt) {
+            _context.IdleInjector.OnUpdate(dt);
+        }
     }
 }

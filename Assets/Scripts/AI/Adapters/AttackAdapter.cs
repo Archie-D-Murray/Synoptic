@@ -10,6 +10,8 @@ namespace AI.Adapters {
     public abstract class AttackAdapter {
         protected float _normalizedTime;
 
+        public float NormalizedTime => _normalizedTime;
+
         public abstract void OnEvent(AnimationClip clip, AttackData data);
     }
 
