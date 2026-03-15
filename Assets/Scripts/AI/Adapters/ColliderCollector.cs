@@ -10,6 +10,8 @@ namespace AI.Adapters {
         [SerializeField] private bool _allowCollection = false;
         [SerializeField] private int _defaultCapacity = 32;
 
+        [SerializeField] private LayerMask _mask = -1;
+
         private void Awake() {
             Transforms.EnsureCapacity(_defaultCapacity);
             Colliders.EnsureCapacity(_defaultCapacity);
@@ -38,7 +40,7 @@ namespace AI.Adapters {
         }
 
         private void OnTriggerEnter(Collider collider) {
-            if (_allowCollection && Transforms.Contains(collider.transform)) {
+            if (_allowCollection && (_mask.value & 1 << collider.gameObject.layer) > 0 && !Transforms.Contains(collider.transform)) {
                 Transforms.Add(collider.transform);
                 Colliders.Add(collider);
             }
