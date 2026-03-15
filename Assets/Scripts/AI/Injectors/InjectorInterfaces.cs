@@ -7,9 +7,25 @@ using UnityEngine;
 
 namespace AI.Injectors {
     public interface IStateInjector {
+
+        ///
+        ///<summary>Called once upon state machine initialisation</summary>
+        ///
         public void ProvideState(StateMachineContext context);
+
+        ///
+        ///<summary>Called once upon entering state</summary>
+        ///
         public void OnEnter();
+
+        ///
+        ///<summary>Called once per update cycle - it is recommended for this to be in Update()</summary>
+        ///
         public void OnUpdate(float dt);
+
+        ///
+        ///<summary>Called once upon state exit</summary>
+        ///
         public void OnExit();
     }
 
@@ -40,6 +56,7 @@ namespace AI.Injectors {
 
     public interface IAttackInjector : IStateInjector {
         public bool CanAttack();
+        public bool SwitchToChase();
         public float AttackTime();
         public List<AttackAdapter> GetAttacks();
         public void RestartAttackCooldown();

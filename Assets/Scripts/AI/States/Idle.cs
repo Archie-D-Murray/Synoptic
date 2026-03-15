@@ -9,8 +9,16 @@ namespace AI {
             _context = context;
         }
 
+        protected override void OnEnter() {
+            _context.IdleInjector.OnEnter();
+        }
+
         protected override void OnUpdate(float dt) {
             _context.IdleInjector.OnUpdate(dt);
+        }
+
+        protected override void OnExit() {
+            _context.IdleInjector.OnExit();
         }
     }
 }

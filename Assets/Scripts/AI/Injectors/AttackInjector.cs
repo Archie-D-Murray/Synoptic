@@ -12,6 +12,7 @@ namespace AI.Injectors {
         [SerializeField] private CountDownTimer _attackTimer = new CountDownTimer(1.0f);
         private StateMachineContext _context;
         [SerializeField] private NullAttackAdapter _nullAttack = new NullAttackAdapter();
+        [SerializeField] private float _attackRange;
 
         public List<AttackAdapter> GetAttacks() {
             return new List<AttackAdapter>() { _nullAttack };
@@ -40,6 +41,10 @@ namespace AI.Injectors {
         public void RestartAttackCooldown() {
             _attackTimer.Reset();
             _attackTimer.Start();
+        }
+
+        public bool SwitchToChase() {
+            return Vector3.Distance(_context.Detector.TargetPosition, _context.Position) >= _attackRange;
         }
     }
 }

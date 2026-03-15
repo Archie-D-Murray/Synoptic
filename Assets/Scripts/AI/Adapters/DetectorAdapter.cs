@@ -17,6 +17,9 @@ namespace AI.Adapters {
         public Transform Target => _target;
         public Vector3 TargetPosition => _target ? _target.position : _lastTargetPosition;
         public bool JustLostTarget => _justLostTarget;
+        public bool HasTarget() {
+            return Target;
+        }
     }
 
     public class RangeDetectorAdapter : DetectorAdapter {
