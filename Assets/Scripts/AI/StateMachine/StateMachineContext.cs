@@ -41,7 +41,7 @@ namespace AI.HSM {
         [SerializeField] private AIStateView[] _array;
         private Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
 
-        private State GetState(AIState state) {
+        private State Get(AIState state) {
             if (_lookup.TryGetValue(state, out int index)) {
                 return _array[index].State;
             } else {
@@ -51,7 +51,7 @@ namespace AI.HSM {
 
         public State this[AIState state] {
             get {
-                return GetState(state);
+                return Get(state);
             }
             private set {
                 if (_lookup.TryGetValue(state, out int index)) {
@@ -94,31 +94,23 @@ namespace AI.HSM {
             this[view.Key] = factory.Create(view.Key, this[view.Parent]);
         }
 
-        private bool Patrol() {
-            return IdleInjector.DoneIdling() && UnityEngine.Random.value >= 0.5f;
-        }
-
-        private bool Wander() {
-            return IdleInjector.DoneIdling() && UnityEngine.Random.value < 0.5f;
-        }
-
         private void GetDefaultTransitions() {
             // Idle
-            StateMachine.AddStateTransition(GetState(AIState.Idle), GetState(AIState.Wander), new LambdaPredicate(Wander));
-            StateMachine.AddStateTransition(GetState(AIState.Idle), GetState(AIState.Patrol), new LambdaPredicate(Patrol));
-            StateMachine.AddStateTransition(GetState(AIState.Idle), GetState(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
+            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(IdleInjector.DoneIdling), new RandomChancePredicate(0.5f)));
+            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Patrol), new AndPredicate(new LambdaPredicate(IdleInjector.DoneIdling), new RandomChancePredicate(0.5f)));
+            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Wander
-            StateMachine.AddStateTransition(GetState(AIState.Wander), GetState(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
+            StateMachine.AddStateTransition(Get(AIState.Wander), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Patrol
-            StateMachine.AddStateTransition(GetState(AIState.Patrol), GetState(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
+            StateMachine.AddStateTransition(Get(AIState.Patrol), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Chase
-            StateMachine.AddStateTransition(GetState(AIState.Chase), GetState(AIState.Attack), new LambdaPredicate(ChaseInjector.SwitchToAttack));
+            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Attack), new LambdaPredicate(ChaseInjector.SwitchToAttack));
 
             // Attack
-            StateMachine.AddStateTransition(GetState(AIState.Attack), GetState(AIState.Chase), new LambdaPredicate(AttackInjector.SwitchToChase));
+            StateMachine.AddStateTransition(Get(AIState.Attack), Get(AIState.Chase), new LambdaPredicate(AttackInjector.SwitchToChase));
         }
 
         public void InitDefaultInjectors() {
