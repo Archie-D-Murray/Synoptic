@@ -185,6 +185,16 @@ public static class Extensions {
         return Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
+    public static bool ContainsParentInHierarchy(this Transform transform, Transform parent) {
+        if (!transform) { return false; }
+        for (Transform p = transform.parent; p; p = p.parent) {
+            if (parent == p) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Collider2D Closest(this Collider2D[] colliders, Vector2 position) {
         Collider2D returnValue = null;
         float closest = float.MaxValue;

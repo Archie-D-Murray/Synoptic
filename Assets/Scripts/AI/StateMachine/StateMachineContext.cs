@@ -38,7 +38,7 @@ namespace AI.HSM {
         public IAttackInjector AttackInjector { get; protected set; }
         public Vector3 Position => Self.position;
 
-        [SerializeField] private AIStateView[] _array;
+        [SerializeField] private AIStateView[] _array = new AIStateView[] { new AIStateView() { Key = AIState.Root, Parent = AIState.None } };
         private Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
 
         private State Get(AIState state) {

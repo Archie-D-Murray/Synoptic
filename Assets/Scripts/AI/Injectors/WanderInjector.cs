@@ -5,7 +5,7 @@ using UnityEngine;
 using Utilities;
 
 namespace AI.Injectors {
-    public class WanderInjector : IWanderInjector {
+    public class WanderInjector : MonoBehaviour, IWanderInjector {
 
         [SerializeField] private Vector3 _initialPosition;
         [SerializeField] private Vector3 _wanderTarget;
