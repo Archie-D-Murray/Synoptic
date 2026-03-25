@@ -30,6 +30,7 @@ namespace AI.HSM {
         public StateMachine StateMachine;
         public Transform Self;
         public DetectorAdapter Detector;
+        public AICooldownManager Cooldowns;
 
         public IIdleInjector IdleInjector { get; protected set; }
         public IWanderInjector WanderInjector { get; protected set; }

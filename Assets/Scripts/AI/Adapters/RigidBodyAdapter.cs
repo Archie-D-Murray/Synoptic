@@ -10,6 +10,8 @@ namespace AI.Adapters {
         [SerializeField] private Vector3 _target;
         [SerializeField] private bool _hasTarget = false;
 
+        public override Vector3 Target => _target;
+
         public override void Move(Vector3 velocity) {
             _hasTarget = false;
             _rb.linearVelocity = velocity;
@@ -36,6 +38,18 @@ namespace AI.Adapters {
 
         public override Vector3 Velocity() {
             return _rb.linearVelocity;
+        }
+
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object other) {
+            return base.Equals(other);
+        }
+
+        public override string ToString() {
+            return base.ToString();
         }
     }
 }

@@ -6,6 +6,8 @@ namespace AI.Adapters {
         protected float _maxSpeed;
         protected float _acceleration;
 
+        public abstract Vector3 Target { get; }
+
         public abstract void SetDestination(Vector3 targetPosition);
         public abstract void Move(Vector3 velocity);
 

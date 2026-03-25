@@ -5,46 +5,42 @@ using AI.HSM;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Injectors {
     public class AttackInjector : MonoBehaviour, IAttackInjector {
-        [SerializeField] private CountDownTimer _attackTimer = new CountDownTimer(1.0f);
-        private StateMachineContext _context;
-        [SerializeField] private NullAttackAdapter _nullAttack = new NullAttackAdapter();
+        [SerializeField] private List<AttackAdapter> _attacks = new List<AttackAdapter>() { new NullAttackAdapter() };
         [SerializeField] private float _attackRange;
 
-        public List<AttackAdapter> GetAttacks() {
-            return new List<AttackAdapter>() { _nullAttack };
+        private static int _attackCD = AICooldownManager.GetHash("Attack");
+
+        public List<AttackAdapter> GetAttacks(StateMachineContext context) {
+            return _attacks;
         }
 
-        public bool CanAttack() {
-            return _attackTimer.IsFinished;
+        public bool CanAttack(StateMachineContext context) {
+            return context.Cooldowns.Get(_attackCD).IsFinished;
         }
 
-        public void OnEnter() { }
+        public void OnEnter(StateMachineContext context) { }
 
-        public void OnExit() { }
+        public void OnExit(StateMachineContext context) { }
 
-        public void OnUpdate(float dt) {
-            _attackTimer.Update(dt);
+        public void OnUpdate(StateMachineContext context, float dt) {
+            context.Cooldowns.Get(_attackCD).Update(dt);
         }
 
-        public void ProvideState(StateMachineContext context) {
-            _context = context;
+        public void Init() { }
+
+        public float AttackTime(StateMachineContext context) {
+            return context.Cooldowns.Get(_attackCD).InitialTime;
         }
 
-        public float AttackTime() {
-            return _attackTimer.InitialTime;
+        public void RestartAttackCooldown(StateMachineContext context) {
+            context.Cooldowns.Get(_attackCD).Reset();
+            context.Cooldowns.Get(_attackCD).Start();
         }
 
-        public void RestartAttackCooldown() {
-            _attackTimer.Reset();
-            _attackTimer.Start();
-        }
-
-        public bool SwitchToChase() {
-            return Vector3.Distance(_context.Detector.TargetPosition, _context.Position) >= _attackRange;
+        public bool SwitchToChase(StateMachineContext context) {
+            return Vector3.Distance(context.Detector.TargetPosition, context.Position) >= _attackRange;
         }
     }
 }

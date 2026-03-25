@@ -23,8 +23,11 @@ namespace AI {
 
     public class AICooldownManager {
         [SerializeField] private List<AICooldown> _cooldowns = new List<AICooldown>();
-        int _nextCooldown = 0;
         private readonly Dictionary<int, int> _cooldownIDs = new Dictionary<int, int>();
+
+        public static int GetHash(string name) {
+            return Animator.StringToHash(name);
+        }
 
         public void Update(float dt) {
             foreach (AICooldown cooldown in _cooldowns) {
@@ -35,8 +38,8 @@ namespace AI {
         }
 
         public int CreateCooldown(float time, string name, bool managed = true) {
-            int id = ++_nextCooldown;
-            if (name == string.Empty) { name = $"[{id}] Cooldown"; } else { name = $"[{id}] {name}"; }
+            if (name == string.Empty) { name = $"[{_cooldowns.Count}] Cooldown"; }
+            int id = GetHash(name);
             _cooldowns.Add(new AICooldown(name, id, time, managed));
             _cooldownIDs.Add(id, _cooldowns.Count - 1);
 
