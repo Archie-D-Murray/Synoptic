@@ -2,38 +2,33 @@ using AI.HSM;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Injectors {
 
     public class RandomIdleInjector : MonoBehaviour, IIdleInjector {
-        [SerializeField] private CountDownTimer _idleTimer;
         [SerializeField] private float _maxWaitTime = 15;
         [SerializeField] private float _minWaitTime = 5;
 
-        private StateMachineContext _context;
+        private static int _waitTimeID = AICooldownManager.GetHash("WaitTime");
 
-        public void ProvideState(StateMachineContext context) {
-            _context = context;
+        public void Init() { }
+
+        private void Start(StateMachineContext context) {
+            context.Cooldowns.Get(_waitTimeID).Reset(Random.Range(_minWaitTime, _maxWaitTime));
         }
 
-        private void Start() {
-            _idleTimer = new CountDownTimer(Random.Range(_minWaitTime, _maxWaitTime));
+        public void OnEnter(StateMachineContext context) {
+            context.Cooldowns.Get(_waitTimeID).Reset(Random.Range(_minWaitTime, _maxWaitTime));
+            context.Cooldowns.Get(_waitTimeID).Start();
         }
 
-        public void OnEnter() {
-            _idleTimer.Reset(Random.Range(_minWaitTime, _maxWaitTime));
-            _idleTimer.Start();
+        public bool DoneIdling(StateMachineContext context) {
+            return context.Cooldowns.Get(_waitTimeID).IsFinished;
         }
 
-        public bool DoneIdling() {
-            return _idleTimer.IsFinished;
+        public void OnUpdate(StateMachineContext context, float dt) {
+            context.Cooldowns.Get(_waitTimeID).Update(dt);
         }
 
-        public void OnUpdate(float dt) {
-            _idleTimer.Update(dt);
-        }
-
-        public void OnExit() { }
+        public void OnExit(StateMachineContext context) { }
     }
 }

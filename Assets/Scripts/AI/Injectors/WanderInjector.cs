@@ -2,43 +2,38 @@ using AI.HSM;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Injectors {
-    public class WanderInjector : IWanderInjector {
+    public class WanderInjector : MonoBehaviour, IWanderInjector {
 
         [SerializeField] private Vector3 _initialPosition;
-        [SerializeField] private Vector3 _wanderTarget;
         [SerializeField] private float _maxRange = 10.0f;
         [SerializeField] private float _minWanderTime = 5.0f;
         [SerializeField] private float _maxWanderTime = 10.0f;
-        [SerializeField] private CountDownTimer _wanderTimer = new CountDownTimer(5.0f);
+        [SerializeField] private bool _initialiseWithTransformPosition;
 
-        private StateMachineContext _context;
+        private int _wanderTimerID = AICooldownManager.GetHash("WanderTimer");
 
-        public void ProvideState(StateMachineContext context) {
-            _context = context;
-            _initialPosition = _context.Self.position;
+        public void Init() {
+            _initialPosition = transform.position;
         }
 
-        public Vector3 GetWanderPoint() {
-            _wanderTarget = _initialPosition + (Random.insideUnitCircle * _maxRange).ToXZ();
-            _wanderTimer.Reset(Random.Range(_minWanderTime, _maxWanderTime));
-            return _wanderTarget;
+        public Vector3 GetWanderPoint(StateMachineContext context) {
+            context.Cooldowns.Get(_wanderTimerID).Reset(Random.Range(_minWanderTime, _maxWanderTime));
+            return _initialPosition + (Random.insideUnitCircle * _maxRange).ToXZ();
         }
 
-        public void OnEnter() { }
+        public void OnEnter(StateMachineContext context) { }
 
-        public void OnExit() { }
+        public void OnExit(StateMachineContext context) { }
 
-        public void OnUpdate(float dt) {
-            if (Vector3.Distance(_wanderTarget, _context.Self.position) <= 0.5f && !_wanderTimer.IsRunning) {
-                _wanderTimer.Update(dt);
+        public void OnUpdate(StateMachineContext context, float dt) {
+            if (Vector3.Distance(context.Movement.Target, context.Position) <= 0.5f && !context.Cooldowns.Get(_wanderTimerID).IsRunning) {
+                context.Cooldowns.Get(_wanderTimerID).Update(dt);
             }
         }
 
-        public bool NextWanderPoint() {
-            return _wanderTimer.IsFinished;
+        public bool NextWanderPoint(StateMachineContext context) {
+            return context.Cooldowns.Get(_wanderTimerID).IsFinished;
         }
     }
 }

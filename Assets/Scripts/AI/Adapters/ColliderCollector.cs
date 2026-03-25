@@ -1,20 +1,35 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
 namespace AI.Adapters {
+
     public class ColliderCollector : MonoBehaviour {
         public readonly HashSet<Transform> Transforms = new HashSet<Transform>();
         public readonly HashSet<Collider> Colliders = new HashSet<Collider>();
 
+        [Header("Collection Settings")]
         [SerializeField] private bool _allowCollection = false;
         [SerializeField] private int _defaultCapacity = 32;
-
         [SerializeField] private LayerMask _mask = -1;
+
+        [Header("Debug")]
+        [SerializeField] private bool _debug;
+        [SerializeField] private List<Collider> _colliders;
+
+        private Func<GameObject, bool> _targetFilter;
 
         private void Awake() {
             Transforms.EnsureCapacity(_defaultCapacity);
             Colliders.EnsureCapacity(_defaultCapacity);
+            _colliders = new List<Collider>(_defaultCapacity);
+            _targetFilter = (GameObject _) => true;
+        }
+
+        public void SetTargetFilter(Func<GameObject, bool> filter) {
+            if (filter == null) { return; }
+            _targetFilter = filter;
         }
 
         public void EnableCollection() {
@@ -37,12 +52,18 @@ namespace AI.Adapters {
         public void ClearCollections() {
             Transforms.Clear();
             Colliders.Clear();
+            if (_debug) {
+                _colliders.Clear();
+            }
         }
 
         private void OnTriggerEnter(Collider collider) {
-            if (_allowCollection && (_mask.value & 1 << collider.gameObject.layer) > 0 && !Transforms.Contains(collider.transform)) {
+            if (_allowCollection && (_mask.value & 1 << collider.gameObject.layer) > 0 && (_targetFilter?.Invoke(collider.gameObject) ?? true) && !Transforms.Contains(collider.transform)) {
                 Transforms.Add(collider.transform);
                 Colliders.Add(collider);
+                if (_debug) {
+                    _colliders.Add(collider);
+                }
             }
         }
     }

@@ -2,35 +2,30 @@ using AI.HSM;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Injectors {
     public class CyclePatrolInjector : MonoBehaviour, IPatrolInjector {
         [SerializeField] private Vector3[] _wanderPoints;
-        [SerializeField] private CountDownTimer _timePerPoint = new CountDownTimer(2.5f);
         [SerializeField] private float _targetDistance = 0.5f;
-        [SerializeField] private int _patrolIndex;
-        private StateMachineContext _context;
 
-        public void ProvideState(StateMachineContext context) {
-            _context = context;
-        }
+        private static int _timePerPointID = AICooldownManager.GetHash("TimePerPoint");
 
-        public Vector3 GetPatrolTarget(int index) {
+        public void Init() { }
+
+        public Vector3 GetPatrolTarget(StateMachineContext context, int index) {
             return _wanderPoints[index];
         }
 
-        public void OnEnter() { }
+        public void OnEnter(StateMachineContext context) { }
 
-        public void OnExit() { }
+        public void OnExit(StateMachineContext context) { }
 
-        public void OnUpdate(float dt) { }
+        public void OnUpdate(StateMachineContext context, float dt) { }
 
-        public int Next(int index) {
+        public int Next(StateMachineContext context, int index) {
             return ++index % _wanderPoints.Length;
         }
 
-        public int Prev(int index) {
+        public int Prev(StateMachineContext context, int index) {
             if (index > 1) {
                 return index - 1;
             } else {
@@ -38,17 +33,17 @@ namespace AI.Injectors {
             }
         }
 
-        public void TickPatrolPoint(float dt) {
-            if (!_timePerPoint.IsRunning) { _timePerPoint.Start(); }
-            _timePerPoint.Update(dt);
+        public void TickPatrolPoint(StateMachineContext context, float dt) {
+            if (!context.Cooldowns.Get(_timePerPointID).IsRunning) { context.Cooldowns.Get(_timePerPointID).Start(); }
+            context.Cooldowns.Get(_timePerPointID).Update(dt);
         }
 
-        public bool FinishedPatrolPoint(int index) {
-            return _timePerPoint.IsFinished;
+        public bool FinishedPatrolPoint(StateMachineContext context, int index) {
+            return context.Cooldowns.Get(_timePerPointID).IsFinished;
         }
 
-        public bool AtPatrolPoint(Vector3 position, int index) {
-            return Vector3.Distance(position, GetPatrolTarget(index)) <= _targetDistance;
+        public bool AtPatrolPoint(StateMachineContext context, Vector3 position, int index) {
+            return Vector3.Distance(position, GetPatrolTarget(context, index)) <= _targetDistance;
         }
     }
 }

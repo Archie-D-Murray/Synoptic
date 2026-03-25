@@ -8,8 +8,9 @@ namespace Utilities {
     public abstract class Timer {
         [SerializeField] protected float _initialTime;
         [SerializeField] protected float _time;
+        [SerializeField, HideInInspector] private bool _isRunning = false;
 
-        public bool IsRunning { get; protected set; }
+        public bool IsRunning { get => _isRunning; protected set => _isRunning = value; }
         public Action OnTimerStart = delegate { };
         public Action OnTimerStop = delegate { };
         protected Timer(float initialTime) {

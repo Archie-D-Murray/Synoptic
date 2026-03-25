@@ -78,7 +78,7 @@ namespace AI.HSM {
         }
 
         public bool Evaluate() {
-            return UnityEngine.Random.value <= chance;
+            return UnityEngine.Random.value <= _chance;
         }
     }
 
