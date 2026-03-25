@@ -12,21 +12,17 @@ namespace AI.Injectors {
 
         public void Init() { }
 
-        private void Start(StateMachineContext context) {
-            context.Cooldowns.Get(_waitTimeID).Reset(Random.Range(_minWaitTime, _maxWaitTime));
-        }
-
         public void OnEnter(StateMachineContext context) {
-            context.Cooldowns.Get(_waitTimeID).Reset(Random.Range(_minWaitTime, _maxWaitTime));
-            context.Cooldowns.Get(_waitTimeID).Start();
+            context.CooldownManager.Get(_waitTimeID).Reset(Random.Range(_minWaitTime, _maxWaitTime));
+            context.CooldownManager.Get(_waitTimeID).Start();
         }
 
         public bool DoneIdling(StateMachineContext context) {
-            return context.Cooldowns.Get(_waitTimeID).IsFinished;
+            return context.CooldownManager.Get(_waitTimeID).IsFinished;
         }
 
         public void OnUpdate(StateMachineContext context, float dt) {
-            context.Cooldowns.Get(_waitTimeID).Update(dt);
+            context.CooldownManager.Get(_waitTimeID).Update(dt);
         }
 
         public void OnExit(StateMachineContext context) { }

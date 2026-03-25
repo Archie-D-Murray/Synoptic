@@ -3,8 +3,8 @@ using UnityEngine;
 namespace AI.Adapters {
 
     public abstract class MovementAdapter : MonoBehaviour {
-        protected float _maxSpeed;
-        protected float _acceleration;
+        [SerializeField] protected float _maxSpeed = 1.0f;
+        [SerializeField] protected float _acceleration = 1.0f;
 
         public abstract Vector3 Target { get; }
 

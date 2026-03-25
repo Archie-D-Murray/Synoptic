@@ -12,6 +12,10 @@ namespace AI.Adapters {
 
         public override Vector3 Target => _target;
 
+        private void OnValidate() {
+            _rb = GetComponent<Rigidbody>();
+        }
+
         public override void Move(Vector3 velocity) {
             _hasTarget = false;
             _rb.linearVelocity = velocity;

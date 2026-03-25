@@ -1,16 +1,28 @@
 using System.Collections.Generic;
 using System.Reflection;
 
+using UnityEngine;
+
 namespace AI.HSM {
     public class StateMachine {
-        public readonly State Root;
         private bool _started = false;
         public readonly Dictionary<State, State> InitialStates = new Dictionary<State, State>();
         public readonly Dictionary<State, HashSet<TransitionCondition>> StateTransitions = new Dictionary<State, HashSet<TransitionCondition>>();
         public readonly HashSet<TransitionCondition> AnyStateTransition = new HashSet<TransitionCondition>();
 
+        protected State _root;
+        public State Root => _root;
+
+        public StateMachine() {
+            _root = null;
+        }
+
         public StateMachine(State root) {
-            Root = root;
+            _root = root;
+        }
+
+        public void SetRoot(State root) {
+            _root = root;
         }
 
         public void Start() {
@@ -43,6 +55,14 @@ namespace AI.HSM {
 
         public void AddStateTransition(State from, State to, IPredicate condition) {
             AddState(from, new TransitionCondition(to, condition));
+        }
+
+        public void AddInitialState(State state, State initial) {
+            if (InitialStates.ContainsKey(state)) {
+                Debug.LogWarning($"Tried to set initial state of {state.GetType().Name} but already have entry - using previous initial value");
+                return;
+            }
+            InitialStates.Add(state, initial);
         }
 
         private void AddState(State from, TransitionCondition condition) {

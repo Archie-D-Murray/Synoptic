@@ -21,7 +21,7 @@ namespace AI.HSM {
 
         protected virtual State GetTransition() {
             State transition = null;
-            foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions[this]) {
+            foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions.GetValueOrDefault(GetLeaf(), null)) {
                 if (transitionCondition.Evaluate()) {
                     transition = transitionCondition.To;
                 }

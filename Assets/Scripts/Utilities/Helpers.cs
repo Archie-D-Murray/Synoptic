@@ -24,13 +24,13 @@ namespace Utilities {
         public float AngleToMouse(Transform obj) {
             return Vector2.SignedAngle(
                 Vector2.up,
-                ((Vector2)MainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)obj.position).normalized
+                ((Vector2) MainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2) obj.position).normalized
             );
         }
 
         public float AngleToMouseOpposite(Transform obj) {
             return Vector2.SignedAngle(
-                ((Vector2)MainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)obj.position).normalized,
+                ((Vector2) MainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2) obj.position).normalized,
                 Vector2.up
             );
         }
@@ -59,6 +59,14 @@ namespace Utilities {
             while (degrees < -360.0f) { degrees += 360.0f; }
             while (degrees > +360.0f) { degrees -= 360.0f; }
             return Mathf.Clamp(degrees, min, max);
+        }
+
+        public static void ContextLog(MonoBehaviour context, object message) {
+            if (context) {
+                Debug.Log($"[{context.GetType().Name} (Object: {context.name})]: {message}");
+            } else {
+                Debug.Log($"[{context.GetType().Name} (null)]: {message}");
+            }
         }
     }
 }

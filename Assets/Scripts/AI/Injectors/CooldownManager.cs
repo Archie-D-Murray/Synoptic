@@ -3,6 +3,7 @@ using Utilities;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AI {
 
@@ -13,6 +14,13 @@ namespace AI {
         public CountDownTimer Timer;
         [HideInInspector] public bool Managed = true;
 
+        public AICooldown(string name, float cooldown, bool managed = true) {
+            Name = name;
+            ID = AICooldownManager.GetHash(name);
+            Timer = new CountDownTimer(cooldown);
+            Managed = managed;
+        }
+
         public AICooldown(string name, int id, float cooldown, bool managed = true) {
             Name = name;
             ID = id;
@@ -21,9 +29,22 @@ namespace AI {
         }
     }
 
+    [Serializable]
     public class AICooldownManager {
-        [SerializeField] private List<AICooldown> _cooldowns = new List<AICooldown>();
-        private readonly Dictionary<int, int> _cooldownIDs = new Dictionary<int, int>();
+        [SerializeField] private List<AICooldown> _cooldowns;
+        private readonly Dictionary<int, int> _cooldownIDs;
+
+        public AICooldownManager() {
+            _cooldowns = new List<AICooldown>();
+            _cooldownIDs = new Dictionary<int, int>();
+        }
+        public AICooldownManager(AICooldown[] cooldowns) {
+            _cooldowns = cooldowns.ToList();
+            _cooldownIDs = new Dictionary<int, int>();
+            for (int i = 0; i < _cooldowns.Count; i++) {
+                _cooldownIDs.Add(_cooldowns[i].ID, i);
+            }
+        }
 
         public static int GetHash(string name) {
             return Animator.StringToHash(name);
@@ -37,7 +58,7 @@ namespace AI {
             }
         }
 
-        public int CreateCooldown(float time, string name, bool managed = true) {
+        public int CreateCooldown(float time, string name, bool managed = false) {
             if (name == string.Empty) { name = $"[{_cooldowns.Count}] Cooldown"; }
             int id = GetHash(name);
             _cooldowns.Add(new AICooldown(name, id, time, managed));

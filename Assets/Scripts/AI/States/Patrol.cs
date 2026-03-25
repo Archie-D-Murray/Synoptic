@@ -11,24 +11,24 @@ namespace AI {
         }
 
         protected override void OnEnter() {
-            _context.PatrolInjector.OnEnter();
-            _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_patrolIndex));
+            _context.PatrolInjector.OnEnter(_context);
+            _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
         }
 
         protected override void OnUpdate(float dt) {
-            _context.PatrolInjector.OnUpdate(dt);
-            if (_context.PatrolInjector.AtPatrolPoint(_context.Self.position, _patrolIndex)) {
-                _context.PatrolInjector.TickPatrolPoint(dt);
+            _context.PatrolInjector.OnUpdate(_context, dt);
+            if (_context.PatrolInjector.AtPatrolPoint(_context, _context.Self.position, _patrolIndex)) {
+                _context.PatrolInjector.TickPatrolPoint(_context, dt);
             }
 
-            if (_context.PatrolInjector.FinishedPatrolPoint(_patrolIndex)) {
-                _patrolIndex = _context.PatrolInjector.Next(_patrolIndex);
-                _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_patrolIndex));
+            if (_context.PatrolInjector.FinishedPatrolPoint(_context, _patrolIndex)) {
+                _patrolIndex = _context.PatrolInjector.Next(_context, _patrolIndex);
+                _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
             }
         }
 
         protected override void OnExit() {
-            _context.PatrolInjector.OnExit();
+            _context.PatrolInjector.OnExit(_context);
             _context.Movement.SetDestination(_context.Self.position);
         }
     }

@@ -10,15 +10,15 @@ namespace AI {
         }
 
         protected override void OnEnter() {
-            _context.IdleInjector.OnEnter();
+            _context.IdleInjector.OnEnter(_context);
         }
 
         protected override void OnUpdate(float dt) {
-            _context.IdleInjector.OnUpdate(dt);
+            _context.IdleInjector.OnUpdate(_context, dt);
         }
 
         protected override void OnExit() {
-            _context.IdleInjector.OnExit();
+            _context.IdleInjector.OnExit(_context);
         }
     }
 }

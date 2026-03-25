@@ -34,12 +34,12 @@ namespace AI.Injectors {
         }
 
         public void TickPatrolPoint(StateMachineContext context, float dt) {
-            if (!context.Cooldowns.Get(_timePerPointID).IsRunning) { context.Cooldowns.Get(_timePerPointID).Start(); }
-            context.Cooldowns.Get(_timePerPointID).Update(dt);
+            if (!context.CooldownManager.Get(_timePerPointID).IsRunning) { context.CooldownManager.Get(_timePerPointID).Start(); }
+            context.CooldownManager.Get(_timePerPointID).Update(dt);
         }
 
         public bool FinishedPatrolPoint(StateMachineContext context, int index) {
-            return context.Cooldowns.Get(_timePerPointID).IsFinished;
+            return context.CooldownManager.Get(_timePerPointID).IsFinished;
         }
 
         public bool AtPatrolPoint(StateMachineContext context, Vector3 position, int index) {

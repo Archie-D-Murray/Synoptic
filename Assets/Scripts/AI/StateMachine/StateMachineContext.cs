@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AI.Adapters;
 using AI.Injectors;
@@ -23,14 +24,21 @@ namespace AI.HSM {
         public List<StateNode> Children;
     }
 
-    [Serializable]
-    public class StateMachineContext {
+    public class StateMachineContext : MonoBehaviour {
         public MovementAdapter Movement;
         public AnimationAdapter Animator;
         public StateMachine StateMachine;
         public Transform Self;
         public DetectorAdapter Detector;
-        public AICooldownManager Cooldowns;
+        public AICooldownManager CooldownManager = new AICooldownManager(new AICooldown[] {
+            new AICooldown("WaitTime", 1.0f),
+            new AICooldown("WanderTimer", 4.0f),
+            new AICooldown("TimePerPoint", 2.0f),
+            new AICooldown("LostTargetTimer", 3.0f),
+            new AICooldown("Attack", 1.0f),
+        });
+
+        [SerializeField] protected string _statePath;
 
         public IIdleInjector IdleInjector { get; protected set; }
         public IWanderInjector WanderInjector { get; protected set; }
@@ -39,10 +47,10 @@ namespace AI.HSM {
         public IAttackInjector AttackInjector { get; protected set; }
         public Vector3 Position => Self.position;
 
-        [SerializeField] private AIStateView[] _array = new AIStateView[] { new AIStateView() { Key = AIState.Root, Parent = AIState.None } };
-        private Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
+        [SerializeField] protected AIStateView[] _array = new AIStateView[] { new AIStateView() { Key = AIState.Root, Parent = AIState.None } };
+        protected Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
 
-        private State Get(AIState state) {
+        protected State Get(AIState state) {
             if (_lookup.TryGetValue(state, out int index)) {
                 return _array[index].State;
             } else {
@@ -61,44 +69,66 @@ namespace AI.HSM {
             }
         }
 
-        public void Init(Action injectorInitOverride = null) {
+        protected virtual void OnValidate() {
+            Self = transform;
+            Animator = GetComponentInChildren<AnimationAdapter>();
+            Movement = GetComponentInChildren<MovementAdapter>();
+            Detector = GetComponentInChildren<DetectorAdapter>();
+        }
+
+        protected void Awake() {
+            Init();
+        }
+
+        protected virtual void Init() {
             int i = 0;
+
+            StateMachine = new StateMachine();
+            StateFactory factory = new StateFactory(StateMachine, this);
+            StateMachine.SetRoot(factory.Create(AIState.Root, null));
+
             foreach (AIStateView view in _array) {
                 _lookup.Add(view.Key, i);
                 i++;
             }
-            StateFactory factory = new StateFactory(StateMachine, this);
-            HashSet<State> created = new HashSet<State>();
+            Dictionary<AIState, int> visited = new Dictionary<AIState, int>();
 
             foreach (AIStateView view in _array) {
-                InitState(view, factory);
+                InitState(view, factory, visited);
             }
 
-            if (injectorInitOverride != null) {
-                injectorInitOverride.Invoke();
-            } else {
-                InitDefaultInjectors();
-            }
+            InitInjectors();
+            GetTransitions();
         }
 
-        private void InitState(AIStateView view, StateFactory factory) {
+        protected void InitState(AIStateView view, StateFactory factory, Dictionary<AIState, int> visited) {
             if (view.Key == AIState.None) {
                 return;
             }
+            if (visited.GetValueOrDefault(view.Key, 0) > 1) {
+                Debug.LogError($"Visited state {view.State} more than once - is there a cyclical dependency?");
+                return;
+            }
             if (view.Key == AIState.Root) {
-                view.State = factory.Create(AIState.Root);
+                view.State = StateMachine.Root;
                 return;
             }
             if (this[view.Parent] == null) {
-                InitState(_array[_lookup[view.Parent]], factory);
+                InitState(_array[_lookup[view.Parent]], factory, visited);
+            }
+            if (visited.ContainsKey(view.Key)) {
+                visited[view.Key]++;
+            } else {
+                visited.Add(view.Key, 1);
             }
             this[view.Key] = factory.Create(view.Key, this[view.Parent]);
         }
 
-        private void GetDefaultTransitions() {
+        protected void GetTransitions() {
+            StateMachine.AddInitialState(Get(AIState.Root), Get(AIState.Idle));
             // Idle
-            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(IdleInjector.DoneIdling), new RandomChancePredicate(0.5f)));
-            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Patrol), new AndPredicate(new LambdaPredicate(IdleInjector.DoneIdling), new RandomChancePredicate(0.5f)));
+            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
+            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Patrol), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
             StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Wander
@@ -108,23 +138,33 @@ namespace AI.HSM {
             StateMachine.AddStateTransition(Get(AIState.Patrol), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Chase
-            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Attack), new LambdaPredicate(ChaseInjector.SwitchToAttack));
+            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Attack), new LambdaPredicate(() => ChaseInjector.SwitchToAttack(this)));
+            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Idle), new LambdaPredicate(() => ChaseInjector.LostTarget(this)));
 
             // Attack
-            StateMachine.AddStateTransition(Get(AIState.Attack), Get(AIState.Chase), new LambdaPredicate(AttackInjector.SwitchToChase));
+            StateMachine.AddStateTransition(Get(AIState.Attack), Get(AIState.Chase), new LambdaPredicate(() => AttackInjector.SwitchToChase(this)));
         }
 
-        public void InitDefaultInjectors() {
+        public virtual void InitInjectors() {
             IdleInjector = Self.GetComponentInChildren<RandomIdleInjector>();
             WanderInjector = Self.GetComponentInChildren<WanderInjector>();
             PatrolInjector = Self.GetComponentInChildren<CyclePatrolInjector>();
             ChaseInjector = Self.GetComponentInChildren<ChaseInjector>();
             AttackInjector = Self.GetComponentInChildren<AttackInjector>();
-            IdleInjector.ProvideState(this);
-            WanderInjector.ProvideState(this);
-            PatrolInjector.ProvideState(this);
-            ChaseInjector.ProvideState(this);
-            AttackInjector.ProvideState(this);
+            IdleInjector.Init();
+            WanderInjector.Init();
+            PatrolInjector.Init();
+            ChaseInjector.Init();
+            AttackInjector.Init();
+        }
+
+        protected virtual void Update() {
+            StateMachine.Tick(Time.deltaTime);
+            _statePath = string.Join(" > ", StateMachine.Root.GetLeaf().PathToRoot().Reverse());
+        }
+
+        protected virtual void FixedUpdate() {
+            StateMachine.FixedTick();
         }
     }
 }

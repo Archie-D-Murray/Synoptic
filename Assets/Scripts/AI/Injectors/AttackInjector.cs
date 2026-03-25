@@ -17,7 +17,7 @@ namespace AI.Injectors {
         }
 
         public bool CanAttack(StateMachineContext context) {
-            return context.Cooldowns.Get(_attackCD).IsFinished;
+            return context.CooldownManager.Get(_attackCD).IsFinished;
         }
 
         public void OnEnter(StateMachineContext context) { }
@@ -25,22 +25,22 @@ namespace AI.Injectors {
         public void OnExit(StateMachineContext context) { }
 
         public void OnUpdate(StateMachineContext context, float dt) {
-            context.Cooldowns.Get(_attackCD).Update(dt);
+            context.CooldownManager.Get(_attackCD).Update(dt);
         }
 
         public void Init() { }
 
         public float AttackTime(StateMachineContext context) {
-            return context.Cooldowns.Get(_attackCD).InitialTime;
+            return context.CooldownManager.Get(_attackCD).InitialTime;
         }
 
         public void RestartAttackCooldown(StateMachineContext context) {
-            context.Cooldowns.Get(_attackCD).Reset();
-            context.Cooldowns.Get(_attackCD).Start();
+            context.CooldownManager.Get(_attackCD).Reset();
+            context.CooldownManager.Get(_attackCD).Start();
         }
 
         public bool SwitchToChase(StateMachineContext context) {
-            return Vector3.Distance(context.Detector.TargetPosition, context.Position) >= _attackRange;
+            return Vector3.Distance(context.Detector.TargetPosition, context.Position) > _attackRange || !context.Detector.HasTarget();
         }
     }
 }

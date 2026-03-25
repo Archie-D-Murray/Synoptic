@@ -10,7 +10,7 @@ namespace AI.Injectors {
         private static int _lostTargetID = AICooldownManager.GetHash("LostTargetTimer");
 
         public bool LostTarget(StateMachineContext context) {
-            return !context.Detector.Target && context.Cooldowns.Get(_lostTargetID).IsFinished;
+            return !context.Detector.Target && context.CooldownManager.Get(_lostTargetID).IsFinished;
         }
 
         public void OnEnter(StateMachineContext context) { }
@@ -18,13 +18,13 @@ namespace AI.Injectors {
         public void OnExit(StateMachineContext context) { }
 
         public void OnUpdate(StateMachineContext context, float dt) {
-            context.Cooldowns.Get(_lostTargetID).Update(dt);
+            context.CooldownManager.Get(_lostTargetID).Update(dt);
         }
 
         public void Init() { }
 
         public void StartLostTimer(StateMachineContext context) {
-            context.Cooldowns.Get(_lostTargetID).Start();
+            context.CooldownManager.Get(_lostTargetID).Start();
         }
 
         public bool SwitchToAttack(StateMachineContext context) {

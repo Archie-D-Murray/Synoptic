@@ -13,20 +13,20 @@ namespace AI {
         }
 
         protected override void OnEnter() {
-            _context.ChaseInjector.OnEnter();
+            _context.ChaseInjector.OnEnter(_context);
         }
 
         protected override void OnUpdate(float dt) {
-            _context.ChaseInjector.OnUpdate(dt);
+            _context.ChaseInjector.OnUpdate(_context, dt);
 
             _context.Movement.SetDestination(_context.Detector.TargetPosition);
             if (_context.Detector.JustLostTarget) {
-                _context.ChaseInjector.StartLostTimer();
+                _context.ChaseInjector.StartLostTimer(_context);
             }
         }
 
         protected override void OnExit() {
-            _context.ChaseInjector.OnExit();
+            _context.ChaseInjector.OnExit(_context);
         }
     }
 }

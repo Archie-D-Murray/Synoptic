@@ -10,19 +10,19 @@ namespace AI {
         }
 
         protected override void OnEnter() {
-            _context.WanderInjector.OnEnter();
-            _context.Movement.SetDestination(_context.WanderInjector.GetWanderPoint());
+            _context.WanderInjector.OnEnter(_context);
+            _context.Movement.SetDestination(_context.WanderInjector.GetWanderPoint(_context));
         }
 
         protected override void OnUpdate(float dt) {
-            _context.WanderInjector.OnUpdate(dt);
-            if (_context.WanderInjector.NextWanderPoint()) {
-                _context.Movement.SetDestination(_context.WanderInjector.GetWanderPoint());
+            _context.WanderInjector.OnUpdate(_context, dt);
+            if (_context.WanderInjector.NextWanderPoint(_context)) {
+                _context.Movement.SetDestination(_context.WanderInjector.GetWanderPoint(_context));
             }
         }
 
         protected override void OnExit() {
-            _context.WanderInjector.OnExit();
+            _context.WanderInjector.OnExit(_context);
             _context.Movement.SetDestination(_context.Self.position);
         }
     }
