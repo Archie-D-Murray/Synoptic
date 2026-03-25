@@ -81,4 +81,22 @@ namespace AI.HSM {
             return UnityEngine.Random.value <= chance;
         }
     }
+
+    public class CascadePredicate : IPredicate {
+        private IPredicate[] _predicates;
+
+        public CascadePredicate(ICollection<IPredicate> predicates) {
+            _predicates = predicates.ToArray();
+        }
+
+        public bool Evaluate() {
+            foreach (IPredicate predicate in _predicates) {
+                if (!predicate.Evaluate()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
 }
