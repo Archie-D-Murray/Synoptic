@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AI.Adapters {
 
-    public enum AIAnimationType { None, Idle, Wander, Patrol, Chase, Attack }
+    public enum AIAnimationType { None, Idle, Wander, Patrol, Chase, Attack, Dead }
 
     [Serializable]
     public class Animation {
@@ -15,6 +15,8 @@ namespace AI.Adapters {
         public string Layer;
     }
 
+    ///<summary>Provides an abstract interface for animation</summary>
+    ///<summary>Currently natively supports playing defined animations and provides access to underlying animator</summary>
     public class AnimationAdapter : MonoBehaviour {
         [SerializeField] protected Animation[] _animations;
         [SerializeField] protected AIAnimationType _animation;
@@ -39,6 +41,9 @@ namespace AI.Adapters {
             }
         }
 
+        ///<summary>Plays animation if defined in animations array</summary>
+        ///<param name="animation">Animation with corresponding entry in array</param>
+        ///<param name="normalizedTransitionDuration">Normalised transition time forwarded to Animator.CrossFade()</param>
         public virtual void Play(AIAnimationType animation, float normalizedTransitionDuration = 0.1f) {
             if (_lookup.TryGetValue(animation, out int hash)) {
                 if (_currentHash == hash) { return; }
@@ -50,8 +55,28 @@ namespace AI.Adapters {
             }
         }
 
+        ///<summary>Gets current animation length handling multiple blended clips for a given layer</summary>
+        ///<param name="layer">Layer to calculate anim length from</param>
+        ///<returns>Average of clip length multiplied by clip weight for all blended clips</returns>
         public float GetCurrentAnimationLength(int layer = -1) {
             return _animator.GetCurrentAnimatorClipInfo(layer).Average(clip => clip.clip.length * clip.weight);
+        }
+
+        ///<summary>Gets current animation playing from given layer</summary>
+        ///<param name="layer">Layer to calculate anim length from</param>
+        ///<returns>Current clip or heightest weighted clip if multiple are blended</returns>
+        public AnimationClip GetCurrentClip(int layer = -1) {
+            AnimationClip clip = null;
+            float weight = 0.0f;
+
+            foreach (AnimatorClipInfo info in _animator.GetCurrentAnimatorClipInfo(layer)) {
+                if (info.weight > weight) {
+                    weight = info.weight;
+                    clip = info.clip;
+                }
+            }
+
+            return clip;
         }
     }
 }

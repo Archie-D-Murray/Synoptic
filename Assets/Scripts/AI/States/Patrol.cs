@@ -1,6 +1,8 @@
 using AI.HSM;
 
 namespace AI {
+
+    ///<summary>Moves along a set of patrol points waiting for a specified duration at each point</summary>
     public class PatrolState : State {
 
         protected readonly StateMachineContext _context;
@@ -10,23 +12,32 @@ namespace AI {
             _context = context;
         }
 
+        ///<summary>Sets destination to patrol point + propagates OnEnter to patrol injector</summary>
+        ///<param name="dt"> Time since last update - used to update patrol point timer</param>
         protected override void OnEnter() {
             _context.PatrolInjector.OnEnter(_context);
             _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
         }
 
+        ///<summary>Update Patrol state handling ticking current patrol index and updating target destination</summary>
+        ///<param name="dt">Time since last update - used to update patrol point timer</param>
         protected override void OnUpdate(float dt) {
             _context.PatrolInjector.OnUpdate(_context, dt);
+
+            // At current patrol target
             if (_context.PatrolInjector.AtPatrolPoint(_context, _context.Self.position, _patrolIndex)) {
                 _context.PatrolInjector.TickPatrolPoint(_context, dt);
             }
 
+            // Move to next patrol point
             if (_context.PatrolInjector.FinishedPatrolPoint(_context, _patrolIndex)) {
+                _context.PatrolInjector.OnPatrolPointFinish(_context);
                 _patrolIndex = _context.PatrolInjector.Next(_context, _patrolIndex);
                 _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
             }
         }
 
+        ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>
         protected override void OnExit() {
             _context.PatrolInjector.OnExit(_context);
             _context.Movement.SetDestination(_context.Self.position);
