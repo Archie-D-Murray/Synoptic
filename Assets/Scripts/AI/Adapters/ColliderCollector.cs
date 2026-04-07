@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace AI.Adapters {
 
+    ///<summary>Collects colliders that collide with the object matching mask and condition</summary>
     public class ColliderCollector : MonoBehaviour {
         public readonly HashSet<Transform> Transforms = new HashSet<Transform>();
         public readonly HashSet<Collider> Colliders = new HashSet<Collider>();
@@ -27,15 +28,24 @@ namespace AI.Adapters {
             _targetFilter = (GameObject _) => true;
         }
 
+        ///<summary>Sets filter function for colliders - can be null</summary>
+        ///<param name="filter">Function used in OnTriggerEnter to filter colliders</param>
         public void SetTargetFilter(Func<GameObject, bool> filter) {
             if (filter == null) { return; }
             _targetFilter = filter;
         }
 
-        public void EnableCollection() {
+        ///<summary>Enables collection</summary>
+        ///<param name="clearCollections">Optionally clear cached collections</param>
+        public void EnableCollection(bool clearCollections = true) {
+            if (clearCollections) {
+                ClearCollections();
+            }
             _allowCollection = true;
         }
 
+        ///<summary>Disables collection</summary>
+        ///<param name="clearCollections">Optionally clear cached collections</param>
         public void DisableCollection(bool clearCollections = false) {
             _allowCollection = false;
 
@@ -44,11 +54,26 @@ namespace AI.Adapters {
             }
         }
 
-        public bool ToggleCollection(bool enabled) {
+        ///<summary>Toggles collection state</summary>
+        ///<param name="clearCollections">Optionally clear cached collections</param>
+        ///<returns>New collection state (true if collection is enabled)</returns>
+        public bool ToggleCollection(bool clearCollections) {
             _allowCollection = enabled;
+
+            if (clearCollections) {
+                ClearCollections();
+            }
+
             return _allowCollection;
         }
 
+        ///<summary>Sets collection state</summary>
+        ///<param name="enabled">New state (true to enable collection)</param>
+        public void SetCollection(bool enabled) {
+            _allowCollection = enabled;
+        }
+
+        ///<summary>Clears all cached collections</summary>
         public void ClearCollections() {
             Transforms.Clear();
             Colliders.Clear();

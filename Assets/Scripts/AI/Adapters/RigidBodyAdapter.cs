@@ -10,24 +10,29 @@ namespace AI.Adapters {
         [SerializeField] private Vector3 _target;
         [SerializeField] private bool _hasTarget = false;
 
+        ///<summary>Target position to navigate to</summary>
         public override Vector3 Target => _target;
 
         private void OnValidate() {
             _rb = GetComponent<Rigidbody>();
         }
 
+        ///<summary>Move using velocity</summary>
+        ///<param name="velocity">Velocity to move with (not multiplied by either Time.fixedDeltaTime or Time.deltaTime)</param>
         public override void Move(Vector3 velocity) {
             _hasTarget = false;
             _rb.linearVelocity = velocity;
         }
 
+        ///<summary>Start moving toward destination (without pathfinding)</summary>
+        ///<param name="targetPosition">Position to move to - used as delta to provide direction</param>
         public override void SetDestination(Vector3 targetPosition) {
             _hasTarget = true;
             _target = targetPosition;
         }
 
         private void FixedUpdate() {
-            if (_hasTarget) {
+            if (_hasTarget) { // Moving in direction of target
                 _targetSpeed = Mathf.Clamp01(Vector3.Distance(_target, _rb.position) / _maxSpeed);
                 _currentSpeed = Mathf.MoveTowards(_currentSpeed, _targetSpeed, Time.fixedDeltaTime * _acceleration);
                 _rb.linearVelocity = (_target - _rb.position).normalized * _currentSpeed;
@@ -36,24 +41,14 @@ namespace AI.Adapters {
             }
         }
 
+        ///<summary>Current speed</summary>
         public override float Speed() {
             return _rb.linearVelocity.magnitude;
         }
 
+        ///<summary>Current velocity</summary>
         public override Vector3 Velocity() {
             return _rb.linearVelocity;
-        }
-
-        public override int GetHashCode() {
-            return base.GetHashCode();
-        }
-
-        public override bool Equals(object other) {
-            return base.Equals(other);
-        }
-
-        public override string ToString() {
-            return base.ToString();
         }
     }
 }

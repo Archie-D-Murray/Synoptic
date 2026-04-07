@@ -5,16 +5,23 @@ using UnityEngine;
 using Utilities;
 
 namespace AI.Adapters {
+    ///<summary>Determines nearest target within a range or previous if still in range</summary>
     public class RangeDetectorAdapter : DetectorAdapter {
 
         [SerializeField] private Vector3 _offset = Vector3.up * 1.5f;
         [SerializeField] private float _range = 5.0f;
-        [SerializeField] private LayerMask _mask = int.MaxValue;
+
+        ///<summary>Layer Mask for Physics.OverlapSphere()</summary>
+        [SerializeField] private LayerMask _mask = -1;
+
+        ///<summary>Duration between FindTarget calls</summary>
         [SerializeField] private CountDownTimer _searchTimer = new CountDownTimer(0.1f);
 
         protected Collider[] _found = new Collider[32];
         protected HashSet<Transform> _unique = new HashSet<Transform>(32);
 
+        ///<summary>Updates current target</summary>
+        ///<returns>Nearest target if no target or old if still in range, null if nothing was found</returns>
         protected override Transform FindTarget() {
             _justLostTarget = false;
 
@@ -62,6 +69,7 @@ namespace AI.Adapters {
             _searchTimer.Start();
         }
 
+        ///<summary>Searches for a new target every time search timer finishes</summary>
         protected void FixedUpdate() {
             _searchTimer.Update(Time.fixedDeltaTime);
             if (_searchTimer.IsFinished) {
