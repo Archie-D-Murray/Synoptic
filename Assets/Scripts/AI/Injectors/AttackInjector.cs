@@ -6,41 +6,69 @@ using AI.HSM;
 using UnityEngine;
 
 namespace AI.Injectors {
+    ///<summary>Provides an attacks and range checking logic
     public class AttackInjector : MonoBehaviour, IAttackInjector {
+
+        ///<summary>Attacks an entity can do</summary>
         [SerializeField] private List<AttackAdapter> _attacks = new List<AttackAdapter>() { new NullAttackAdapter() };
+
+        ///<summary>Attack range for all entities using injector</summary>
         [SerializeField] private float _attackRange;
 
+        ///<summary>Attack cooldown ID</summary>
         private static int _attackCD = AICooldownManager.GetHash("Attack");
 
+        ///<summary>Gets attacks for entities using injector</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>List of attack adapters to be queued into attack state</returns>
         public List<AttackAdapter> GetAttacks(StateMachineContext context) {
             return _attacks;
         }
 
+        ///<summary>Is attack timer finished</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>IsFinished value of attack timer cooldown</returns>
         public bool CanAttack(StateMachineContext context) {
             return context.CooldownManager.Get(_attackCD).IsFinished;
         }
 
+        ///<summary>OnEnter call propagated from state</summary>
+        ///<param name="context">Entity context</param>
         public void OnEnter(StateMachineContext context) { }
 
+        ///<summary>OnExit call propagated from state</summary>
+        ///<param name="context">Entity context</param>
         public void OnExit(StateMachineContext context) { }
 
+        ///<summary>OnUpdate call propagated from state - updates attack tiemr</summary>
+        ///<param name="context">Entity context</param>
+        ///<param name="dt">Time since last state machine update</param>
         public void OnUpdate(StateMachineContext context, float dt) {
             context.CooldownManager.Get(_attackCD).Update(dt);
         }
 
+        ///<summary>Used for first time initialisation</summary>
         public void Init() { }
 
+        ///<summary>Gets attack time of entity associated with context</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>Attack Time of entity associated with context</returns>
         public float AttackTime(StateMachineContext context) {
             return context.CooldownManager.Get(_attackCD).InitialTime;
         }
 
+        ///<summary>Restarts attack cooldown as attack has occurred</summary>
+        ///<param name="context">Entity context</param>
         public void RestartAttackCooldown(StateMachineContext context) {
             context.CooldownManager.Get(_attackCD).Reset();
             context.CooldownManager.Get(_attackCD).Start();
         }
 
-        public bool SwitchToChase(StateMachineContext context) {
-            return Vector3.Distance(context.Detector.TargetPosition, context.Position) > _attackRange || !context.Detector.HasTarget();
+        ///<summary>Is the target too far to attack or no target found</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>Signal to transition back to different state</returns>
+        public bool UnableToAttack(StateMachineContext context) {
+            return context.Detector.TargetPosition.InRange(context.Position, _attackRange) || !context.Detector.HasTarget();
         }
     }
 }
