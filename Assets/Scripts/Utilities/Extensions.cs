@@ -143,6 +143,10 @@ public static class Extensions {
         return delta.sqrMagnitude <= (range * range);
     }
 
+    public static bool InRange(this Vector3 vector, Vector3 other, float range) {
+        return (vector - other).sqrMagnitude <= (range * range);
+    }
+
     public static Vector3 ToXZ(this Vector2 vector) {
         return new Vector3(vector.x, 0, vector.y);
     }

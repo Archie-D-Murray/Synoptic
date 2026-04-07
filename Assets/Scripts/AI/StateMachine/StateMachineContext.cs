@@ -24,6 +24,13 @@ namespace AI.HSM {
         public List<StateNode> Children;
     }
 
+    ///<summary>Base context for the state machine</summary>
+    ///<summary>Add references to things like an enemy script here to use in states/injectors</summary>
+    ///<summary>override things like GetTransitions to allow for different behaviours</summary>
+    ///<remarks>
+    ///Classes inheriting this should only override GetTransition and InitInjectors.
+    ///All gameplay values should be inside this class to allow for states and injectors to acces them
+    ///</remarks>
     public class StateMachineContext : MonoBehaviour {
         public MovementAdapter Movement;
         public AnimationAdapter Animator;
@@ -47,9 +54,22 @@ namespace AI.HSM {
         public IAttackInjector AttackInjector { get; protected set; }
         public Vector3 Position => Self.position;
 
+        private bool _injectorsOnSameObj = false;
+
+        private void CheckInjectorsOnSameObject() {
+            foreach (Transform child in transform) {
+                if (child.gameObject.GetComponent<IIdleInjector>() != null) {
+                    _injectorsOnSameObj = child.GetComponents<IStateInjector>().Length == this.GetType().GetFields().Where(field => field.GetType().IsAssignableFrom(typeof(IStateInjector))).Count();
+                    return;
+                }
+            }
+            _injectorsOnSameObj = false;
+        }
+
         [SerializeField] protected AIStateView[] _array = new AIStateView[] { new AIStateView() { Key = AIState.Root, Parent = AIState.None } };
         protected Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
 
+        ///<summary>Gets a state object from state type or null if not present</summary>
         protected State Get(AIState state) {
             if (_lookup.TryGetValue(state, out int index)) {
                 return _array[index].State;
@@ -58,6 +78,7 @@ namespace AI.HSM {
             }
         }
 
+        ///<summary>Gets a state object from state type or null if not present</summary>
         public State this[AIState state] {
             get {
                 return Get(state);
@@ -74,13 +95,15 @@ namespace AI.HSM {
             Animator = GetComponentInChildren<AnimationAdapter>();
             Movement = GetComponentInChildren<MovementAdapter>();
             Detector = GetComponentInChildren<DetectorAdapter>();
+            CheckInjectorsOnSameObject();
         }
 
         protected void Awake() {
             Init();
         }
 
-        protected virtual void Init() {
+        ///<summary>Initialises states as dependency tree</summary>
+        protected void Init() {
             int i = 0;
 
             StateMachine = new StateMachine();
@@ -101,6 +124,8 @@ namespace AI.HSM {
             GetTransitions();
         }
 
+        ///<summary>Initialises view.State with real state from factory resolving parents first</summary>
+        ///<remarks>Root state should already be initialised</remarks>
         protected void InitState(AIStateView view, StateFactory factory, Dictionary<AIState, int> visited) {
             if (view.Key == AIState.None) {
                 return;
@@ -124,7 +149,9 @@ namespace AI.HSM {
             this[view.Key] = factory.Create(view.Key, this[view.Parent]);
         }
 
-        protected void GetTransitions() {
+        ///<summary>Provides all transitions to state machine after injectors are initialised</summary>
+        ///<summary>Can be overriden by user to provide custom state data</summary>
+        protected virtual void GetTransitions() {
             StateMachine.AddInitialState(Get(AIState.Root), Get(AIState.Idle));
             // Idle
             StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
@@ -138,19 +165,35 @@ namespace AI.HSM {
             StateMachine.AddStateTransition(Get(AIState.Patrol), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 
             // Chase
-            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Attack), new LambdaPredicate(() => ChaseInjector.SwitchToAttack(this)));
+            StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Attack), new LambdaPredicate(() => ChaseInjector.InAttackRange(this)));
             StateMachine.AddStateTransition(Get(AIState.Chase), Get(AIState.Idle), new LambdaPredicate(() => ChaseInjector.LostTarget(this)));
 
             // Attack
-            StateMachine.AddStateTransition(Get(AIState.Attack), Get(AIState.Chase), new LambdaPredicate(() => AttackInjector.SwitchToChase(this)));
+            StateMachine.AddStateTransition(Get(AIState.Attack), Get(AIState.Chase), new LambdaPredicate(() => AttackInjector.UnableToAttack(this)));
         }
 
+        ///<summary>Provides all injectors for states to use</summary>
+        ///<summary>Can be overriden to use a common set of states (maybe specific to enemy type, etc)</summary>
         public virtual void InitInjectors() {
-            IdleInjector = Self.GetComponentInChildren<RandomIdleInjector>();
-            WanderInjector = Self.GetComponentInChildren<WanderInjector>();
-            PatrolInjector = Self.GetComponentInChildren<CyclePatrolInjector>();
-            ChaseInjector = Self.GetComponentInChildren<ChaseInjector>();
-            AttackInjector = Self.GetComponentInChildren<AttackInjector>();
+            if (_injectorsOnSameObj) {
+                GameObject injectorRoot = null;
+                foreach (Transform child in transform) {
+                    if (child.GetComponent<IIdleInjector>() != null) {
+                        injectorRoot = child.gameObject;
+                    }
+                }
+                IdleInjector = injectorRoot.GetComponent<IIdleInjector>();
+                WanderInjector = injectorRoot.GetComponent<IWanderInjector>();
+                PatrolInjector = injectorRoot.GetComponent<IPatrolInjector>();
+                ChaseInjector = injectorRoot.GetComponent<IChaseInjector>();
+                AttackInjector = injectorRoot.GetComponent<IAttackInjector>();
+            } else {
+                IdleInjector = Self.GetComponentInChildren<IIdleInjector>();
+                WanderInjector = Self.GetComponentInChildren<IWanderInjector>();
+                PatrolInjector = Self.GetComponentInChildren<IPatrolInjector>();
+                ChaseInjector = Self.GetComponentInChildren<IChaseInjector>();
+                AttackInjector = Self.GetComponentInChildren<IAttackInjector>();
+            }
             IdleInjector.Init();
             WanderInjector.Init();
             PatrolInjector.Init();
@@ -158,12 +201,17 @@ namespace AI.HSM {
             AttackInjector.Init();
         }
 
+        ///<summary>Updates state machine</summary>
+        ///<summary>Unlikely to change unless state machine needs to not tick on Update</summary>
         protected virtual void Update() {
-            StateMachine.Tick(Time.deltaTime);
+            float dt = Time.deltaTime;
+            CooldownManager.Update(dt);
+            StateMachine.Tick(dt);
             _statePath = string.Join(" > ", StateMachine.Root.GetLeaf().PathToRoot().Reverse());
         }
 
-        protected virtual void FixedUpdate() {
+        ///<summary>Forwards FixedUpdate to state machine</summary>
+        protected void FixedUpdate() {
             StateMachine.FixedTick();
         }
     }
