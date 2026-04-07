@@ -33,6 +33,7 @@ namespace AI.Injectors {
 
         ///<summary>OnUpdate call propagated from state</summary>
         ///<param name="context">Entity context</param>
+        ///<param name="dt">Time since last state machine update</param>
         public void OnUpdate(StateMachineContext context, float dt) { }
 
         ///<summary>OnExit call propagated from state</summary>
