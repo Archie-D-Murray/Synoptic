@@ -38,11 +38,11 @@ namespace AI.HSM {
         public Transform Self;
         public DetectorAdapter Detector;
         public AICooldownManager CooldownManager = new AICooldownManager(new AICooldown[] {
-            new AICooldown("WaitTime", 1.0f),
-            new AICooldown("WanderTimer", 4.0f),
-            new AICooldown("TimePerPoint", 2.0f),
-            new AICooldown("LostTargetTimer", 3.0f),
-            new AICooldown("Attack", 1.0f),
+            new AICooldown("WaitTime", 1.0f, false),
+            new AICooldown("WanderTimer", 4.0f, false),
+            new AICooldown("TimePerPoint", 2.0f, false),
+            new AICooldown("LostTargetTimer", 3.0f, false),
+            new AICooldown("Attack", 1.0f, false),
         });
 
         [SerializeField] protected string _statePath;
@@ -117,6 +117,7 @@ namespace AI.HSM {
             Dictionary<AIState, int> visited = new Dictionary<AIState, int>();
 
             foreach (AIStateView view in _array) {
+                if (view.Key == AIState.Root) { continue; }
                 InitState(view, factory, visited);
             }
 
@@ -154,7 +155,7 @@ namespace AI.HSM {
         protected virtual void GetTransitions() {
             StateMachine.AddInitialState(Get(AIState.Root), Get(AIState.Idle));
             // Idle
-            StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
+            // StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Wander), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
             StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Patrol), new AndPredicate(new LambdaPredicate(() => IdleInjector.DoneIdling(this)), new RandomChancePredicate(0.5f)));
             StateMachine.AddStateTransition(Get(AIState.Idle), Get(AIState.Chase), new LambdaPredicate(Detector.HasTarget));
 

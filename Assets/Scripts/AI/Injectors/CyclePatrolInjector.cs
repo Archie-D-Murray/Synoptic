@@ -29,7 +29,9 @@ namespace AI.Injectors {
 
         ///<summary>OnEnter call propagated from state</summary>
         ///<param name="context">Entity context</param>
-        public void OnEnter(StateMachineContext context) { }
+        public void OnEnter(StateMachineContext context) {
+            context.CooldownManager.Get(_timePerPointID).Resume();
+        }
 
         ///<summary>OnUpdate call propagated from state</summary>
         ///<param name="context">Entity context</param>
@@ -64,7 +66,6 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<param name="dt">Time to tick timer by</param>
         public void TickPatrolPoint(StateMachineContext context, float dt) {
-            if (!context.CooldownManager.Get(_timePerPointID).IsRunning) { context.CooldownManager.Get(_timePerPointID).Start(); }
             context.CooldownManager.Get(_timePerPointID).Update(dt);
         }
 
@@ -79,7 +80,7 @@ namespace AI.Injectors {
         ///<summary>Called upon finishing idling at patrol point</summary>
         ///<param name="context">Entity context</param>
         public void OnPatrolPointFinish(StateMachineContext context) {
-            context.CooldownManager.Get(_timePerPointID).Reset();
+            context.CooldownManager.Get(_timePerPointID).Start();
         }
 
         ///<summary>Is close enough to patrol point to begin idling</summary>

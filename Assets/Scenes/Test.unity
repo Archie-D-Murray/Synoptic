@@ -270,9 +270,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!54 &171047830
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -312,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2052f3b47f3745140973ff176b40f233, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 1
+  _maxSpeed: 2
   _acceleration: 1
   _currentSpeed: 0
   _targetSpeed: 0
@@ -375,35 +375,35 @@ MonoBehaviour:
         _initialTime: 1
         _time: 0
         _isRunning: 0
-      Managed: 1
+      Managed: 0
     - Name: WanderTimer
       ID: 913320953
       Timer:
         _initialTime: 4
         _time: 0
         _isRunning: 0
-      Managed: 1
+      Managed: 0
     - Name: TimePerPoint
       ID: 668488697
       Timer:
         _initialTime: 2
         _time: 0
         _isRunning: 0
-      Managed: 1
+      Managed: 0
     - Name: LostTargetTimer
       ID: 1959913967
       Timer:
         _initialTime: 3
         _time: 0
         _isRunning: 0
-      Managed: 1
+      Managed: 0
     - Name: Attack
       ID: 1080829965
       Timer:
         _initialTime: 1
         _time: 0
         _isRunning: 0
-      Managed: 1
+      Managed: 0
   _statePath: 
   _array:
   - Key: 1
@@ -621,7 +621,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2c5c41243bb6514b9076e9c47e0ae99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _attacks:
+  - rid: 831756555718492232
   _attackRange: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 831756555718492232
+      type: {class: NullAttackAdapter, ns: AI.Adapters, asm: Assembly-CSharp}
+      data:
+        _normalizedTime: 0
 --- !u!114 &878350595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,11 +657,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e1788f249f11d46b6b0e8310dbc89a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _wanderPoints:
-  - {x: 4, y: 0, z: 0}
-  - {x: 0, y: 0, z: 4}
-  - {x: -4, y: 0, z: 0}
-  - {x: 0, y: 0, z: -4}
+  _patrolPoints:
+  - {x: 4, y: 0, z: 4}
+  - {x: 4, y: 0, z: -4}
+  - {x: -4, y: 0, z: 4}
+  - {x: -4, y: 0, z: -4}
   _targetDistance: 0.5
 --- !u!114 &878350597
 MonoBehaviour:
@@ -682,8 +691,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b261e8e3b6dcdb242b133498df124257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxWaitTime: 15
-  _minWaitTime: 5
+  _minIdleTime: 5
+  _maxIdleTime: 15
 --- !u!1 &1089477549
 GameObject:
   m_ObjectHideFlags: 0

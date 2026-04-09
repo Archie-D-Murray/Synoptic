@@ -10,7 +10,8 @@ namespace AI.Injectors {
     public class AttackInjector : MonoBehaviour, IAttackInjector {
 
         ///<summary>Attacks an entity can do</summary>
-        [SerializeField] private List<AttackAdapter> _attacks = new List<AttackAdapter>() { new NullAttackAdapter() };
+        [Tooltip("Do not attempt to add in inspector only through code - inspector cannot create values of abstract types")]
+        [SerializeReference, SubclassSelector] private List<AttackAdapter> _attacks = new List<AttackAdapter>() { new NullAttackAdapter() };
 
         ///<summary>Attack range for all entities using injector</summary>
         [SerializeField] private float _attackRange;

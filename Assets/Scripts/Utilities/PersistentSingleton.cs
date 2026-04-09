@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace Utilities {
 
-    ///<summary>Scene based singleton that is destroyed between scenes</summary>
-    public class Singleton<T> : MonoBehaviour where T : Component {
+    ///<summary>Persistent singleton that is not destroyed between scenes</summary>
+    public class PersistentSingleton<T> : MonoBehaviour where T : Component {
 
         ///<summary>Internal writable instance</summary>
         protected static T _internalInstance;
@@ -36,9 +36,10 @@ namespace Utilities {
                     GameObject obj = new GameObject();
                     obj.name = $"{typeof(T).Name} - AutoCreated";
                     _internalInstance = obj.AddComponent<T>();
-                    (_internalInstance as Singleton<T>).OnAutoCreate();
+                    (_internalInstance as PersistentSingleton<T>).OnAutoCreate();
                 }
-                (_internalInstance as Singleton<T>).OnAwake();
+                (_internalInstance as PersistentSingleton<T>).OnAwake();
+                DontDestroyOnLoad(Instance.gameObject);
             }
         }
 
@@ -62,6 +63,7 @@ namespace Utilities {
 
             if (_internalInstance == null) {
                 _internalInstance = this as T;
+                DontDestroyOnLoad(Instance.gameObject);
                 enabled = true;
             } else {
                 if (this != _internalInstance) {

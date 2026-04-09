@@ -25,7 +25,7 @@ namespace AI {
             _context.PatrolInjector.OnUpdate(_context, dt);
 
             // At current patrol target
-            if (_context.PatrolInjector.AtPatrolPoint(_context, _context.Self.position, _patrolIndex)) {
+            if (_context.PatrolInjector.AtPatrolPoint(_context, _context.Position, _patrolIndex)) {
                 _context.PatrolInjector.TickPatrolPoint(_context, dt);
             }
 

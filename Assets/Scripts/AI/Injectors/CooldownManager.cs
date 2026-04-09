@@ -12,7 +12,7 @@ namespace AI {
         public string Name;
         public int ID;
         public CountDownTimer Timer;
-        [HideInInspector] public bool Managed = true;
+        public bool Managed = true;
 
         public AICooldown(string name, float cooldown, bool managed = true) {
             Name = name;

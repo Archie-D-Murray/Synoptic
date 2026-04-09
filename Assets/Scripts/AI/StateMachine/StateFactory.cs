@@ -21,16 +21,13 @@ namespace AI.HSM {
         ///<returns>Newly created state</returns>
         public State Create(AIState type, State parent = null) {
             return type switch {
+                AIState.Root => new RootState(_stateMachine, null),
                 AIState.Idle => new IdleState(_context, _stateMachine, parent),
                 AIState.Wander => new WanderState(_context, _stateMachine, parent),
                 AIState.Patrol => new PatrolState(_context, _stateMachine, parent),
                 AIState.Chase => new ChaseState(_context, _stateMachine, parent),
                 AIState.Attack => new AttackState(_context, _stateMachine, parent),
                 AIState.Dead => new DeadState(_context, _stateMachine, parent),
-                AIState.Root => ReturnWithLog<RootState>(
-                    new RootState(_stateMachine, null),
-                    "Cannot create a root state as state machine must be intialised with root before factory creation"
-                ),
                 _ => null
             };
         }

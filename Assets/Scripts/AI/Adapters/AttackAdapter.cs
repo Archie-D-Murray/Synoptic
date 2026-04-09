@@ -41,7 +41,7 @@ namespace AI.Adapters {
     ///</summary>
     [System.Serializable]
     public abstract class AttackAdapter {
-        protected float _normalizedTime;
+        [SerializeField] protected float _normalizedTime;
 
         ///<summary>Normalized time for attack anim to call attack once</summary>
         public float NormalizedTime => _normalizedTime;
@@ -58,7 +58,7 @@ namespace AI.Adapters {
     public class NullAttackAdapter : AttackAdapter {
 
         public override void OnEvent(AnimationClip clip, StateMachineContext context) {
-            Debug.Log($"[Attack Adapter]: Null attack called on entity - {context.name}");
+            Debug.Log($"[Attack Adapter (Object: {context.name})]: Null attack adapter called");
         }
     }
 }

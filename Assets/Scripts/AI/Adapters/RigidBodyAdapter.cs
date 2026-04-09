@@ -33,9 +33,9 @@ namespace AI.Adapters {
 
         private void FixedUpdate() {
             if (_hasTarget) { // Moving in direction of target
-                _targetSpeed = Mathf.Clamp01(Vector3.Distance(_target, _rb.position) / _maxSpeed);
+                _targetSpeed = Mathf.Min(Vector3.Distance(_target, _rb.position) * _maxSpeed, _maxSpeed);
                 _currentSpeed = Mathf.MoveTowards(_currentSpeed, _targetSpeed, Time.fixedDeltaTime * _acceleration);
-                _rb.linearVelocity = (_target - _rb.position).normalized * _currentSpeed;
+                _rb.linearVelocity = Vector3.MoveTowards(Vector3.zero, _target - _rb.position, _currentSpeed);
             } else {
                 _currentSpeed = _rb.linearVelocity.magnitude;
             }

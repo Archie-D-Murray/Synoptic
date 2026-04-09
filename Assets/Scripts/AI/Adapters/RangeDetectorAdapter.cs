@@ -58,7 +58,6 @@ namespace AI.Adapters {
                 _lastTargetPosition = closest.position;
                 return closest;
             } else {
-                Helpers.ContextLog(this, "Lost target");
                 _target = null;
                 _justLostTarget = true;
                 return null;
