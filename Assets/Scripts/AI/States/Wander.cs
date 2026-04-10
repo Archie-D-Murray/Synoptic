@@ -28,7 +28,7 @@ namespace AI {
         ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>
         protected override void OnExit() {
             _context.WanderInjector.OnExit(_context);
-            _context.Movement.SetDestination(_context.Self.position);
+            _context.Movement.SetDestination(_context.Position);
         }
     }
 }

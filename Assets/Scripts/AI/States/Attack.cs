@@ -8,7 +8,7 @@ namespace AI {
     public class AttackState : State {
 
         protected readonly StateMachineContext _context;
-        protected readonly PriorityQueue<AttackAdapter, float> _attacks = new PriorityQueue<AttackAdapter, float>(16);
+        protected readonly PriorityQueue<AttackAdaptor, float> _attacks = new PriorityQueue<AttackAdaptor, float>(16);
         protected bool _isAttacking = false;
         protected float _elapsedAttackTime = 0.0f;
 
@@ -30,7 +30,7 @@ namespace AI {
             if (_context.AttackInjector.CanAttack(_context)) {
                 _context.AttackInjector.RestartAttackCooldown(_context);
                 _elapsedAttackTime = 0.0f;
-                foreach (AttackAdapter attack in _context.AttackInjector.GetAttacks(_context)) {
+                foreach (AttackAdaptor attack in _context.AttackInjector.GetAttacks(_context)) {
                     // Attacks are ordered by normalized time
                     _attacks.Enqueue(attack, attack.NormalizedTime);
                     if (attack.NormalizedTime == 0.0f) {

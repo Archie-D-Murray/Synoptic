@@ -10,8 +10,7 @@ namespace AI.Injectors {
     public class AttackInjector : MonoBehaviour, IAttackInjector {
 
         ///<summary>Attacks an entity can do</summary>
-        [Tooltip("Do not attempt to add in inspector only through code - inspector cannot create values of abstract types")]
-        [SerializeReference, SubclassSelector] private List<AttackAdapter> _attacks = new List<AttackAdapter>() { new NullAttackAdapter() };
+        [SerializeReference, SubclassSelector] private List<AttackAdaptor> _attacks = new List<AttackAdaptor>() { new NullAttackAdapter() };
 
         ///<summary>Attack range for all entities using injector</summary>
         [SerializeField] private float _attackRange;
@@ -22,7 +21,7 @@ namespace AI.Injectors {
         ///<summary>Gets attacks for entities using injector</summary>
         ///<param name="context">Entity context</param>
         ///<returns>List of attack adapters to be queued into attack state</returns>
-        public List<AttackAdapter> GetAttacks(StateMachineContext context) {
+        public List<AttackAdaptor> GetAttacks(StateMachineContext context) {
             return _attacks;
         }
 
@@ -69,7 +68,7 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>Signal to transition back to different state</returns>
         public bool UnableToAttack(StateMachineContext context) {
-            return context.Detector.TargetPosition.InRange(context.Position, _attackRange) || !context.Detector.HasTarget();
+            return !context.Detector.TargetPosition.InRange(context.Position, _attackRange) && !context.Detector.HasTarget();
         }
     }
 }

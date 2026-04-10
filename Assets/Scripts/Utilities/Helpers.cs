@@ -124,5 +124,9 @@ namespace Utilities {
                 Debug.Log($"[{context.GetType().Name} (Object: null)]: {message}");
             }
         }
+
+        public static string ClassNameOrNull<T>(T value) where T : class {
+            return value != null ? value.GetType().Name : "Null";
+        }
     }
 }

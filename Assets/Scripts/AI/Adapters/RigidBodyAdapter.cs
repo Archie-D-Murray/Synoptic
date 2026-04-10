@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace AI.Adapters {
     public class RigidBodyAdapter : MovementAdapter {
-        private Rigidbody _rb;
+        [SerializeField] private Rigidbody _rb;
 
         [SerializeField] private float _currentSpeed;
         [SerializeField] private float _targetSpeed;

@@ -12,26 +12,28 @@ using UnityEditor.UIElements;
 using UnityEditor;
 using AI.Adapters;
 
-[CustomPropertyDrawer(typeof(AttackAdapter), true)]
-public class AttackAdapterDrawer : PropertyDrawer {
-
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-        return EditorGUIUtility.singleLineHeight + 2;
-    }
-
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-        EditorGUI.BeginProperty(position, label, property);
-        SerializedProperty normalizedTime = property.FindPropertyRelative("_normalizedTime");
-
-        position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-
-        Rect nameRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-        Rect normalizedRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-        EditorGUI.PropertyField(normalizedRect, normalizedTime);
-
-        EditorGUI.EndProperty();
-    }
-}
+// [CustomPropertyDrawer(typeof(AttackAdaptor))]
+// public class AttackAdapterDrawer : PropertyDrawer {
+//
+//     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+//         return EditorGUIUtility.singleLineHeight + 2;
+//     }
+//
+//     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+//         EditorGUI.BeginProperty(position, label, property);
+//         SerializedProperty normalizedTime = property.FindPropertyRelative("_normalizedTime");
+//
+//         Rect nameRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+//         Rect normalizedRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+//         if (normalizedTime == null) {
+//             EditorGUI.LabelField(normalizedRect, "Null");
+//         } else {
+//             EditorGUI.PropertyField(normalizedRect, normalizedTime);
+//         }
+//
+//         EditorGUI.EndProperty();
+//     }
+// }
 
 [CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
 public class SubclassSelectorPropertyDrawer : PropertyDrawer {

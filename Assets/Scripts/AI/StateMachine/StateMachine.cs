@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 using UnityEngine;
+
+using Utilities;
 
 namespace AI.HSM {
     public class StateMachine {
@@ -50,10 +53,18 @@ namespace AI.HSM {
         }
 
         public void AddAnyTransition(State to, IPredicate condition) {
+            if (to == null) {
+                Debug.LogWarning($"{Environment.StackTrace}\n[StateMachine]: To state was null");
+                return;
+            }
             AnyStateTransition.Add(new TransitionCondition(to, condition));
         }
 
         public void AddStateTransition(State from, State to, IPredicate condition) {
+            if (from == null || to == null) {
+                Debug.LogWarning($"{Environment.StackTrace}\n[StateMachine]: Got a null state in either to or from params: To: {Helpers.ClassNameOrNull(to)}, From: {Helpers.ClassNameOrNull(from)}");
+                return;
+            }
             AddState(from, new TransitionCondition(to, condition));
         }
 

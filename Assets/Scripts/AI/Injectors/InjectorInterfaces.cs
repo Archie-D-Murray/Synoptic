@@ -125,7 +125,7 @@ namespace AI.Injectors {
         ///<summary>Gets attacks for entities using injector</summary>
         ///<param name="context">Entity context</param>
         ///<returns>List of attack adapters to be queued into attack state</returns>
-        public List<AttackAdapter> GetAttacks(StateMachineContext context);
+        public List<AttackAdaptor> GetAttacks(StateMachineContext context);
 
         ///<summary>Restarts attack cooldown as attack has occurred</summary>
         ///<param name="context">Entity context</param>

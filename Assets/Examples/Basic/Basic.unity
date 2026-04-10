@@ -730,12 +730,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attacks:
-  - rid: 831756555718492232
+  - rid: 831756580514431153
+  - rid: 831756580514431159
   _attackRange: 1
   references:
     version: 2
     RefIds:
-    - rid: 831756555718492232
+    - rid: 831756580514431153
+      type: {class: PhysicsCastAdaptor, ns: AI.Examples, asm: Assembly-CSharp}
+      data:
+        _normalizedTime: 0.5
+        _range: 5
+        _layer:
+          serializedVersion: 2
+          m_Bits: 8
+        _damage: 5
+    - rid: 831756580514431159
       type: {class: NullAttackAdapter, ns: AI.Adapters, asm: Assembly-CSharp}
       data:
         _normalizedTime: 0
