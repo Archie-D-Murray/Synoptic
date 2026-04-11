@@ -13,6 +13,9 @@ namespace AI.Injectors {
         ///<summary>Max distance from patrol point to be counted as at point</summary>
         [SerializeField] private float _targetDistance = 0.5f;
 
+        ///<summary>Guard for first time initialisation</summary>
+        private bool _initialised = false;
+
         ///<summary>Patrol wait timer cooldown ID</summary>
         private static int _timePerPointID = AICooldownManager.GetHash("TimePerPoint");
 
@@ -25,7 +28,13 @@ namespace AI.Injectors {
         }
 
         ///<summary>Used for first time initialisation</summary>
-        public void Init() { }
+        public void Init() {
+            if (_initialised) {
+                return;
+            }
+
+            _initialised = true;
+        }
 
         ///<summary>OnEnter call propagated from state</summary>
         ///<param name="context">Entity context</param>
@@ -89,6 +98,18 @@ namespace AI.Injectors {
         ///<returns>True if close enough to patrol point</returns>
         public bool AtPatrolPoint(StateMachineContext context, Vector3 position, int index) {
             return Vector3.Distance(position, GetPatrolTarget(context, index)) <= _targetDistance;
+        }
+
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context) { }
+
+        ///<summary>Get starting patrol point</summary>
+        ///<param name="context">Entity context</param>
+        ///<param name="index">Patrol index</param>
+        ///<returns>New patrol index</returns>
+        public int GetStartIndex(StateMachineContext context, int index) {
+            return index;
         }
     }
 }

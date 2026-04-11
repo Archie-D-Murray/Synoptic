@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Utilities {
 
     ///<summary>Scene based singleton that is destroyed between scenes</summary>
+    [DefaultExecutionOrder(-99)]
     public class Singleton<T> : MonoBehaviour where T : Component {
 
         ///<summary>Internal writable instance</summary>

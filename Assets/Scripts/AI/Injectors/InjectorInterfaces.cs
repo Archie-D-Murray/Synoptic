@@ -11,6 +11,10 @@ namespace AI.Injectors {
         ///<summary>Used for first time initialisation</summary>
         public void Init();
 
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context);
+
         ///<summary>OnEnter call propagated from state</summary>
         ///<param name="context">Entity context</param>
         public void OnEnter(StateMachineContext context);
@@ -47,6 +51,12 @@ namespace AI.Injectors {
     }
 
     public interface IPatrolInjector : IStateInjector {
+
+        ///<summary>Get starting patrol point</summary>
+        ///<param name="context">Entity context</param>
+        ///<param name="index">Patrol index</param>
+        ///<returns>New patrol index</returns>
+        public int GetStartIndex(StateMachineContext context, int index);
 
         ///<summary>Get target patrol point</summary>
         ///<param name="context">Entity context</param>

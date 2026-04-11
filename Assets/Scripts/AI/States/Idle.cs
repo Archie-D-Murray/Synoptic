@@ -19,6 +19,7 @@ namespace AI {
         ///<param name="dt"> Time since last update - used to update idle timer</param>
         protected override void OnUpdate(float dt) {
             _context.IdleInjector.OnUpdate(_context, dt);
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Propagates OnExit to injector</summary>

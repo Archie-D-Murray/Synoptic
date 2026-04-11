@@ -10,13 +10,17 @@ namespace AI.Injectors {
     public class AttackInjector : MonoBehaviour, IAttackInjector {
 
         ///<summary>Attacks an entity can do</summary>
-        [SerializeReference, SubclassSelector] private List<AttackAdaptor> _attacks = new List<AttackAdaptor>() { new NullAttackAdapter() };
+        [SerializeReference, SubclassSelector]
+        private List<AttackAdaptor> _attacks = new List<AttackAdaptor>() { new NullAttackAdapter() };
 
         ///<summary>Attack range for all entities using injector</summary>
         [SerializeField] private float _attackRange;
 
         ///<summary>Attack cooldown ID</summary>
         private static int _attackCD = AICooldownManager.GetHash("Attack");
+
+        ///<summary>Guard for first time initialisation</summary>
+        private bool _initialised = false;
 
         ///<summary>Gets attacks for entities using injector</summary>
         ///<param name="context">Entity context</param>
@@ -48,7 +52,13 @@ namespace AI.Injectors {
         }
 
         ///<summary>Used for first time initialisation</summary>
-        public void Init() { }
+        public void Init() {
+            if (_initialised) {
+                return;
+            }
+
+            _initialised = true;
+        }
 
         ///<summary>Gets attack time of entity associated with context</summary>
         ///<param name="context">Entity context</param>
@@ -68,7 +78,11 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>Signal to transition back to different state</returns>
         public bool UnableToAttack(StateMachineContext context) {
-            return !context.Detector.TargetPosition.InRange(context.Position, _attackRange) && !context.Detector.HasTarget();
+            return !context.Detector.HasTarget() || !context.Detector.TargetPosition.InRange(context.Position, _attackRange);
         }
+
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context) { }
     }
 }

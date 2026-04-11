@@ -23,6 +23,7 @@ namespace AI {
             if (_context.WanderInjector.NextWanderPoint(_context)) {
                 _context.Movement.SetDestination(_context.WanderInjector.GetWanderPoint(_context));
             }
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>

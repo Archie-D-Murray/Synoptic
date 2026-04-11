@@ -16,8 +16,17 @@ namespace AI.Injectors {
         ///<summary>Idle cooldown ID</summary>
         private static int _waitTimeID = AICooldownManager.GetHash("WaitTime");
 
+        ///<summary>Guard for first time initialisation</summary>
+        private bool _initialised = false;
+
         ///<summary>Used for first time initialisation</summary>
-        public void Init() { }
+        public void Init() {
+            if (_initialised) {
+                return;
+            }
+
+            _initialised = true;
+        }
 
         ///<summary>OnEnter call propagated from state</summary>
         ///<param name="context">Entity context</param>
@@ -43,5 +52,9 @@ namespace AI.Injectors {
         ///<summary>OnExit call propagated from state</summary>
         ///<param name="context">Entity context</param>
         public void OnExit(StateMachineContext context) { }
+
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context) { }
     }
 }

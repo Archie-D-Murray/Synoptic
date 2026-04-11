@@ -8,22 +8,22 @@ namespace AI.Examples {
 
         [Header("Health")]
         [SerializeField] private float _maxHealth = 100.0f;
-        [SerializeField] private float _curhealth = 0.0f;
+        [SerializeField] private float _curHealth = 0.0f;
 
         [Space, Header("Behaviour")]
         ///<summary>If true, set current health to max health in Awake</summary>
         [SerializeField] private bool _maxHealthOnAwake = true;
 
         ///<summary>Current health (clamped to max health)</summary>
-        public float CurHealth => _curhealth;
+        public float CurHealth => _curHealth;
         ///<summary>Maximum Health</summary>
         public float MaxHealth => _maxHealth;
 
         ///<summary>Is health 0 and non 0 max health</summary>
-        public bool IsDead => _curhealth == 0.0f && _maxHealth != 0.0f;
+        public bool IsDead => _curHealth == 0.0f && _maxHealth != 0.0f;
 
         ///<summary>Percent health in range [[0, 1]] - clamped</summary>
-        public float PercentHealth => Mathf.Clamp01(_curhealth / _maxHealth);
+        public float PercentHealth => Mathf.Clamp01(_curHealth / _maxHealth);
 
         ///<summary>Invoked each time Damage is called and is valid to damage (including kill hit)</summary>
         public Action<DamageSource, DamageResult> OnDamage = delegate { };
@@ -33,7 +33,7 @@ namespace AI.Examples {
 
         private void Awake() {
             if (_maxHealthOnAwake) {
-                _curhealth = _maxHealth;
+                _curHealth = _maxHealth;
             }
         }
 
@@ -42,15 +42,15 @@ namespace AI.Examples {
         ///<param name="source">Source of damage</param>
         ///<returns>Data about what damage was applied</returns>
         public DamageResult Damage(DamageSource source) {
-            if (_curhealth == 0.0f) {
+            if (_curHealth == 0.0f) {
                 return default;
             } else if (source.Amount <= 0) {
                 return default;
             }
 
-            float damage = Mathf.Min(_curhealth, source.Amount);
+            float damage = Mathf.Min(_curHealth, source.Amount);
 
-            _curhealth -= damage;
+            _curHealth -= damage;
 
             DamageResult result = new DamageResult(damage, IsDead);
 

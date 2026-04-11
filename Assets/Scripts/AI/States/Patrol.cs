@@ -15,6 +15,7 @@ namespace AI {
         ///<summary>Sets destination to patrol point + propagates OnEnter to patrol injector</summary>
         ///<param name="dt"> Time since last update - used to update patrol point timer</param>
         protected override void OnEnter() {
+            _patrolIndex = _context.PatrolInjector.GetStartIndex(_context, _patrolIndex);
             _context.PatrolInjector.OnEnter(_context);
             _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
         }
@@ -35,6 +36,7 @@ namespace AI {
                 _patrolIndex = _context.PatrolInjector.Next(_context, _patrolIndex);
                 _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
             }
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>

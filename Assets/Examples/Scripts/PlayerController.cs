@@ -3,10 +3,14 @@ using System;
 using Utilities;
 
 using UnityEngine;
+using AI.Adapters;
 
 namespace AI.Examples {
+
+    ///<summary>Basic Third Person Movement - Most likely should be replaced with your own</summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Health))]
+    [RequireComponent(typeof(AnimationAdapter))]
     public class PlayerController : MonoBehaviour {
         [Serializable]
         class SpeedParams {
@@ -34,6 +38,8 @@ namespace AI.Examples {
         [SerializeField] private bool _grounded = true;
         [SerializeField] private LayerMask _ground;
         [SerializeField] private Vector3 _groundNormal = Vector3.down;
+        [SerializeField] private float _turnSpeed = 360.0f;
+        [SerializeField] private float _sprintModifier = 1.5f;
 
         [Space, Header("Camera")]
         [SerializeField] private Vector2 _sensitivity = new Vector2(1.0f, -1.0f);
@@ -43,30 +49,31 @@ namespace AI.Examples {
         [SerializeField] private float _camMin = -85.0f;
         [SerializeField] private float _camMax = 85.0f;
         [SerializeField] private bool _canMove;
+        [SerializeField] private Vector3 _localCameraOffset = Vector3.up * 1.5f;
 
         [Space, Header("Debug")]
         [SerializeField] private Vector3 _input;
-        [SerializeField] private Vector3 _targetVel;
+        [SerializeField] private Vector3 _targetDir;
 
         private Rigidbody _rb;
         private Camera _cam;
         private RaycastHit _hit;
+        private AnimationAdapter _animator;
+        private PlayerInputs _inputs;
 
         private void OnValidate() {
-            _cam = GetComponentInChildren<Camera>();
+            _inputs = GetComponent<PlayerInputs>();
+            _cam = Camera.main;
             _rb = GetComponent<Rigidbody>();
+            _animator = GetComponent<AnimationAdapter>();
         }
 
         private void Start() {
-            Cursor.lockState = CursorLockMode.Locked;
+            _inputs.OnLockStateChange += SetCanMove;
         }
 
         private void Update() {
-            if (Input.GetKeyDown(KeyCode.F9) || Input.GetKeyDown(KeyCode.Escape)) {
-                Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
-                _canMove = Cursor.lockState == CursorLockMode.Locked;
-            }
-            if (JumpPressed() && _grounded && _jumpTimer.IsFinished) {
+            if (_inputs.Jump && _grounded && _jumpTimer.IsFinished) {
                 Jump();
             }
         }
@@ -75,9 +82,11 @@ namespace AI.Examples {
 
             CheckGrounded();
 
-            _input = GetClampedWASD();
+            _input = Vector3.ClampMagnitude(_inputs.Move, 1.0f);
 
             _jumpTimer.Update(Time.fixedDeltaTime);
+
+            _targetDir = RotateMovement(_input);
 
             if (_canMove) {
                 if (_grounded && _jumpTimer.IsFinished) {
@@ -85,13 +94,29 @@ namespace AI.Examples {
                 } else {
                     AirMovement(_input);
                 }
+                if (_input.sqrMagnitude >= 0.01f) {
+                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.LookRotation(RotateMovement(_input)), _turnSpeed * Time.deltaTime);
+                }
+                _rb.angularVelocity = Vector3.zero;
             } else {
-                _rb.linearVelocity = Vector3.down * _gravity * Time.fixedDeltaTime;
+                _input = Vector3.zero;
+                if (_grounded && _hit.distance <= 0.01f) {
+                    _rb.linearVelocity = Vector3.zero;
+                } else {
+                    _rb.linearVelocity = Vector3.down * _gravity * Time.fixedDeltaTime;
+                }
+                _rb.angularVelocity = Vector3.zero;
             }
+
+            _animator.SetFloat(AIAnimationParam.Speed, _rb.linearVelocity.magnitude / _groundParams.TargetSpeed);
         }
 
         private void LateUpdate() {
             Look();
+        }
+
+        private void SetCanMove(bool cursorLocked) {
+            _canMove = cursorLocked;
         }
 
         private void Jump() {
@@ -104,7 +129,7 @@ namespace AI.Examples {
             Vector3 velocity = _rb.linearVelocity;
 
             // Apply friction if no jump pressed
-            if (!JumpPressed()) {
+            if (!_inputs.Jump) {
                 float speed = _rb.linearVelocity.WithY(0).magnitude;
 
                 float friction = Mathf.Min(speed, _groundParams.Deceleration) * _friction * Time.fixedDeltaTime;
@@ -118,19 +143,22 @@ namespace AI.Examples {
                 velocity.z *= reducedSpeed;
             }
 
-            Vector3 movement = Quaternion.AngleAxis(_cam.transform.eulerAngles.y, Vector3.up) * input;
+            Vector3 movement = RotateMovement(input);
 
-            velocity = Accelerate(velocity, movement, _groundParams.TargetSpeed, _groundParams.Acceleration * Time.fixedDeltaTime);
+            velocity = Accelerate(velocity, movement, _groundParams.TargetSpeed * GetSpeedModifier(), _groundParams.Acceleration * Time.fixedDeltaTime);
             velocity.y = -_gravity * Time.fixedDeltaTime;
-            _targetVel = transform.InverseTransformDirection(velocity);
 
             _rb.linearVelocity = Vector3.ProjectOnPlane(velocity, _groundNormal);
+        }
+
+        private float GetSpeedModifier() {
+            return _inputs.Sprint ? _sprintModifier : 1.0f;
         }
 
         private void AirMovement(Vector3 input) {
             Vector3 velocity = _rb.linearVelocity;
 
-            Vector3 movement = Quaternion.AngleAxis(_cam.transform.eulerAngles.y, Vector3.up) * input;
+            Vector3 movement = RotateMovement(input);
             float targetSpeed = movement.magnitude * _airParams.TargetSpeed;
             float acceleration = Vector3.Dot(velocity, movement) >= 0 ? _airParams.Acceleration : _airParams.Deceleration;
 
@@ -170,12 +198,19 @@ namespace AI.Examples {
         }
 
         private void Look() {
-            Vector2 mouseInput = Input.mousePositionDelta * _sensitivity * _mouseSpeed * Time.deltaTime;
+            Vector2 mouseInput = _inputs.Look * _sensitivity * _mouseSpeed * Time.deltaTime;
             if (!_canMove) { mouseInput = Vector2.zero; }
-            _camX = Mathf.Clamp(_camX + mouseInput.y, _camMin, _camMax);
-            _camY += mouseInput.x;
-            _cam.transform.localRotation = Quaternion.Euler(_camX, 0, 0);
-            transform.localRotation = Quaternion.Euler(0, _camY, 0);
+            _camX = Helpers.ClampAngle(_camX + mouseInput.y, _camMin, _camMax);
+            _camY += Helpers.ClampAngle(mouseInput.x, -180.0f, 180.0f);
+            _cam.transform.rotation = Quaternion.Euler(_camX, _camY, 0);
+            _cam.transform.position = transform.position.Offset(y: 2.0f) + Quaternion.Euler(_camX, _camY, 0) * _localCameraOffset;
+        }
+
+        Vector3 RotateMovement(Vector3 input) {
+            if (input.sqrMagnitude <= 0.01f) {
+                return Vector3.zero;
+            }
+            return Quaternion.AngleAxis(_camY, Vector3.up) * input;
         }
 
         private Vector3 Accelerate(Vector3 velocity, Vector3 direction, float targetSpeed, float acceleration) {
@@ -189,14 +224,6 @@ namespace AI.Examples {
             velocity.x += acceleration * direction.x;
             velocity.z += acceleration * direction.z;
             return velocity;
-        }
-
-        private Vector3 GetClampedWASD() {
-            return Vector3.ClampMagnitude(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")), 1.0f);
-        }
-
-        private bool JumpPressed() {
-            return Input.GetButton("Jump");
         }
 
         private void CheckGrounded() {

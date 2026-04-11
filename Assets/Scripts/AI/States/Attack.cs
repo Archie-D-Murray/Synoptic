@@ -19,6 +19,7 @@ namespace AI {
         ///<summary>Propagates OnEnter to injector</summary>
         protected override void OnEnter() {
             _context.AttackInjector.OnEnter(_context);
+            _context.Animator.Play(AIAnimationType.Attack);
         }
 
         ///<summary>Update Attack state handling attacking and ticking pending attacks</summary>
@@ -28,13 +29,15 @@ namespace AI {
 
             // Can this entity attack?
             if (_context.AttackInjector.CanAttack(_context)) {
+                _attacks.Clear();
                 _context.AttackInjector.RestartAttackCooldown(_context);
                 _elapsedAttackTime = 0.0f;
                 foreach (AttackAdaptor attack in _context.AttackInjector.GetAttacks(_context)) {
                     // Attacks are ordered by normalized time
-                    _attacks.Enqueue(attack, attack.NormalizedTime);
                     if (attack.NormalizedTime == 0.0f) {
                         attack.OnEvent(_context.Animator.GetCurrentClip(), _context);
+                    } else {
+                        _attacks.Enqueue(attack, attack.NormalizedTime);
                     }
                 }
             }
@@ -47,11 +50,13 @@ namespace AI {
                     _attacks.Dequeue().OnEvent(_context.Animator.GetCurrentClip(), _context);
                 }
             }
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>
         protected override void OnExit() {
             _context.AttackInjector.OnExit(_context);
+            _context.Animator.Play(AIAnimationType.Locomotion);
         }
     }
 }

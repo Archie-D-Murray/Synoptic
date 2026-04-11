@@ -8,6 +8,7 @@ namespace AI.Adapters {
     ///<summary>Determines nearest target within a range or previous if still in range</summary>
     public class RangeDetectorAdapter : DetectorAdapter {
 
+        [Space, Header("Adaptor")]
         [SerializeField] private Vector3 _offset = Vector3.up * 1.5f;
         [SerializeField] private float _range = 5.0f;
 
@@ -24,12 +25,12 @@ namespace AI.Adapters {
         ///<returns>Nearest target if no target or old if still in range, null if nothing was found</returns>
         protected override Transform FindTarget() {
             _justLostTarget = false;
+            Transform prev = _target;
 
             if (_target && Vector3.SqrMagnitude(_target.position - transform.position) <= _range * _range) {
                 _lastTargetPosition = _target.position;
                 return _target;
             } else if (_target) {
-                Helpers.ContextLog(this, "Lost target previous");
                 _target = null;
                 _justLostTarget = true;
             }
@@ -38,6 +39,7 @@ namespace AI.Adapters {
             if (!_target) {
                 int count = Physics.OverlapSphereNonAlloc(transform.position + _offset, _range, _found, _mask);
 
+                _unique.Clear();
                 float dist = float.MaxValue;
                 for (int i = 0; i < count; i++) {
                     if (_found[i].transform.ContainsParentInHierarchy(transform.root)) { continue; }
@@ -59,7 +61,9 @@ namespace AI.Adapters {
                 return closest;
             } else {
                 _target = null;
-                _justLostTarget = true;
+                if (prev && !_target) {
+                    _justLostTarget = true;
+                }
                 return null;
             }
         }

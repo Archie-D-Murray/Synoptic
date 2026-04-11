@@ -25,9 +25,11 @@ namespace AI.HSM {
         ///<returns>Null if staying in current state or new state to move to</returns>
         protected virtual State GetTransition() {
             State transition = null;
-            foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions.GetValueOrDefault(GetLeaf(), null)) {
-                if (transitionCondition.Evaluate()) {
-                    transition = transitionCondition.To;
+            if (StateMachine.StateTransitions.ContainsKey(this)) {
+                foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions.GetValueOrDefault(this)) {
+                    if (transitionCondition.Evaluate()) {
+                        transition = transitionCondition.To;
+                    }
                 }
             }
             foreach (TransitionCondition transitionCondition in StateMachine.AnyStateTransition) {

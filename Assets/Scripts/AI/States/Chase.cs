@@ -27,6 +27,8 @@ namespace AI {
             if (_context.Detector.JustLostTarget) {
                 _context.ChaseInjector.StartLostTimer(_context);
             }
+
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Propagates OnExit to injector</summary>

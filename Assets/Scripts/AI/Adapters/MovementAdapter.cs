@@ -10,6 +10,12 @@ namespace AI.Adapters {
         ///<summary>Target position to navigate to</summary>
         public abstract Vector3 Target { get; }
 
+        ///<summary>Max Speed</summary>
+        public float MaxSpeed => _maxSpeed;
+
+        ///<summary>Normalized Speed (not in range [[0, 1]])</summary>
+        public float NormalizedSpeed => _maxSpeed == 0.0f ? 0.0f : Speed() / _maxSpeed;
+
         ///<summary>Is a path being computed</summary>
         public virtual bool PathPending => false;
 

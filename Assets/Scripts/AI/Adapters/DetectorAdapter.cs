@@ -4,10 +4,10 @@ namespace AI.Adapters {
     ///<summary>Used as a base to determine a target for things like chasing and attacking</summary>
     public abstract class DetectorAdapter : MonoBehaviour {
 
-        protected Transform _target = null;
-        protected Vector3 _lastTargetPosition;
-        protected bool _justLostTarget;
-
+        [Header("Target Data")]
+        [SerializeField] protected Transform _target = null;
+        [SerializeField] protected Vector3 _lastTargetPosition;
+        [SerializeField] protected bool _justLostTarget;
         ///<summary>Updates the current target if current is either null or not considered 'visible'</summary>
         ///<returns>New target - may be null</returns>
         protected abstract Transform FindTarget();

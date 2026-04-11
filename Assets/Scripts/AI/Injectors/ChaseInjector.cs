@@ -12,6 +12,8 @@ namespace AI.Injectors {
         ///<summary>Range to signal to switch to attacking</summary>
         [SerializeField] private float _attackRange;
 
+        private bool _initialised = false;
+
         ///<summary>Attack cooldown ID</summary>
         private static int _lostTargetID = AICooldownManager.GetHash("LostTargetTimer");
 
@@ -38,7 +40,13 @@ namespace AI.Injectors {
         }
 
         ///<summary>Used for first time initialisation</summary>
-        public void Init() { }
+        public void Init() {
+            if (_initialised) {
+                return;
+            }
+
+            _initialised = true;
+        }
 
         ///<summary>Starts window to resume chase upon finding new target</summary>
         ///<param name="context">Entity context</param>
@@ -50,7 +58,11 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>Target is within attack range</returns>
         public bool InAttackRange(StateMachineContext context) {
-            return context.Detector.TargetPosition.InRange(context.Position, _attackRange);
+            return context.Detector.TargetPosition.InRange(context.Position, _attackRange) && context.Detector.HasTarget();
         }
+
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context) { }
     }
 }

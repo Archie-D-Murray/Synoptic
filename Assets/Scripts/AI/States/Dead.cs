@@ -15,5 +15,9 @@ namespace AI {
         protected override void OnEnter() {
             _context.Animator.Play(Adapters.AIAnimationType.Dead);
         }
+
+        protected override void OnUpdate(float dt) {
+            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, 0.0f);
+        }
     }
 }

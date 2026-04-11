@@ -26,14 +26,15 @@ namespace AI.HSM {
         public List<StateNode> Children;
     }
 
+#if AI_ROOT_PROJECT
     ///<summary>Base context for the state machine</summary>
     ///<summary>Add references to things like an enemy script here to use in states/injectors</summary>
-    ///<summary>override things like GetTransitions to allow for different behaviours</summary>
-    ///<remarks>
-    ///Classes inheriting this should only override GetTransition and InitInjectors.
-    ///All gameplay values should be inside this class to allow for states and injectors to acces them
-    ///</remarks>
+    public partial class StateMachineContext : MonoBehaviour {
+#else
+    ///<summary>Base context for the state machine</summary>
+    ///<summary>Add references to things like an enemy script here to use in states/injectors</summary>
     public sealed class StateMachineContext : MonoBehaviour {
+#endif
         public MovementAdapter Movement;
         public AnimationAdapter Animator;
         public StateMachine StateMachine;
@@ -185,65 +186,98 @@ namespace AI.HSM {
 
     [Serializable]
     public class DefaultStateDefinitions : IStateDefinition {
-        public void InitInjectors(StateMachineContext context) {
-            context.IdleInjector = context.GetComponentInChildren<IIdleInjector>();
-            context.WanderInjector = context.GetComponentInChildren<IWanderInjector>();
-            context.PatrolInjector = context.GetComponentInChildren<IPatrolInjector>();
-            context.ChaseInjector = context.GetComponentInChildren<IChaseInjector>();
-            context.AttackInjector = context.GetComponentInChildren<IAttackInjector>();
-            context.IdleInjector.Init();
-            context.WanderInjector.Init();
-            context.PatrolInjector.Init();
-            context.ChaseInjector.Init();
-            context.AttackInjector.Init();
+        public void InitInjectors(StateMachineContext ctx) {
+            ctx.IdleInjector = ctx.GetComponentInChildren<IIdleInjector>();
+            ctx.WanderInjector = ctx.GetComponentInChildren<IWanderInjector>();
+            ctx.PatrolInjector = ctx.GetComponentInChildren<IPatrolInjector>();
+            ctx.ChaseInjector = ctx.GetComponentInChildren<IChaseInjector>();
+            ctx.AttackInjector = ctx.GetComponentInChildren<IAttackInjector>();
+            ctx.IdleInjector.Init();
+            ctx.WanderInjector.Init();
+            ctx.PatrolInjector.Init();
+            ctx.ChaseInjector.Init();
+            ctx.AttackInjector.Init();
+            ctx.IdleInjector.ContextInit(ctx);
+            ctx.WanderInjector.ContextInit(ctx);
+            ctx.PatrolInjector.ContextInit(ctx);
+            ctx.ChaseInjector.ContextInit(ctx);
+            ctx.AttackInjector.ContextInit(ctx);
         }
 
-        public void InitTransitions(StateMachineContext context) {
-            context.StateMachine.AddInitialState(context[AIState.Root], context[AIState.Idle]);
+        public void InitTransitions(StateMachineContext ctx) {
+            ctx.StateMachine.AddInitialState(ctx[AIState.Root], ctx[AIState.Idle]);
             // Idle
-            context.StateMachine.AddStateTransition(
-                context[AIState.Idle],
-                context[AIState.Wander],
-                new AndPredicate(new LambdaPredicate(() => context.IdleInjector.DoneIdling(context)), new RandomChancePredicate(0.5f)));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Idle],
+                ctx[AIState.Wander],
+                new AndPredicate(new LambdaPredicate(() => ctx.IdleInjector.DoneIdling(ctx)), new RandomChancePredicate(0.5f)));
 
-            context.StateMachine.AddStateTransition(
-                context[AIState.Idle],
-                context[AIState.Patrol],
-                new AndPredicate(new LambdaPredicate(() => context.IdleInjector.DoneIdling(context)), new RandomChancePredicate(0.5f)));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Idle],
+                ctx[AIState.Patrol],
+                new AndPredicate(new LambdaPredicate(() => ctx.IdleInjector.DoneIdling(ctx)), new RandomChancePredicate(0.5f)));
 
-            context.StateMachine.AddStateTransition(
-                context[AIState.Idle],
-                context[AIState.Chase],
-                new LambdaPredicate(context.Detector.HasTarget));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Idle],
+                ctx[AIState.Chase],
+                new LambdaPredicate(ctx.Detector.HasTarget));
 
             // Wander
-            context.StateMachine.AddStateTransition(
-                context[AIState.Wander],
-                context[AIState.Chase],
-                new LambdaPredicate(context.Detector.HasTarget));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Wander],
+                ctx[AIState.Chase],
+                new LambdaPredicate(ctx.Detector.HasTarget));
 
             // Patrol
-            context.StateMachine.AddStateTransition(
-                context[AIState.Patrol],
-                context[AIState.Chase],
-                new LambdaPredicate(context.Detector.HasTarget));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Patrol],
+                ctx[AIState.Chase],
+                new LambdaPredicate(ctx.Detector.HasTarget));
 
             // Chase
-            context.StateMachine.AddStateTransition(
-                context[AIState.Chase],
-                context[AIState.Attack],
-                new LambdaPredicate(() => context.ChaseInjector.InAttackRange(context)));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Chase],
+                ctx[AIState.Attack],
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx)));
 
-            context.StateMachine.AddStateTransition(
-                context[AIState.Chase],
-                context[AIState.Idle],
-                new LambdaPredicate(() => context.ChaseInjector.LostTarget(context)));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Chase],
+                ctx[AIState.Idle],
+                new LambdaPredicate(() => ctx.ChaseInjector.LostTarget(ctx)));
 
             // Attack
-            context.StateMachine.AddStateTransition(
-                context[AIState.Attack],
-                context[AIState.Chase],
-                new LambdaPredicate(() => context.AttackInjector.UnableToAttack(context)));
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Attack],
+                ctx[AIState.Chase],
+                new LambdaPredicate(() => ctx.AttackInjector.UnableToAttack(ctx)));
+
+        }
+    }
+
+    [Serializable]
+    public class StationaryEnemyDefinition : IStateDefinition {
+        public void InitInjectors(StateMachineContext ctx) {
+            ctx.IdleInjector = ctx.GetComponentInChildren<IIdleInjector>();
+            ctx.AttackInjector = ctx.GetComponentInChildren<IAttackInjector>();
+            ctx.IdleInjector.Init();
+            ctx.AttackInjector.Init();
+            ctx.IdleInjector.ContextInit(ctx);
+            ctx.AttackInjector.ContextInit(ctx);
+        }
+
+        public void InitTransitions(StateMachineContext ctx) {
+            ctx.StateMachine.AddInitialState(ctx[AIState.Root], ctx[AIState.Idle]);
+            // Idle
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Idle],
+                ctx[AIState.Attack],
+                new LambdaPredicate(() => ctx.Detector.HasTarget()));
+
+            // Attack
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Attack],
+                ctx[AIState.Idle],
+                new LambdaPredicate(() => ctx.Detector.JustLostTarget));
 
         }
     }

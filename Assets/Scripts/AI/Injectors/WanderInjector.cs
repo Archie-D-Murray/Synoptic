@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using AI.HSM;
 
 using UnityEngine;
@@ -5,9 +7,6 @@ using UnityEngine;
 namespace AI.Injectors {
     ///<summary>Randomly wanders to locations within range of reference and waits for random range of time</summary>
     public class WanderInjector : MonoBehaviour, IWanderInjector {
-
-        ///<summary>Reference for wander points</summary>
-        [SerializeField] private Vector3 _initialPosition;
 
         ///<summary>Max wander distance</summary>
         [SerializeField] private float _maxRange = 10.0f;
@@ -21,17 +20,27 @@ namespace AI.Injectors {
         ///<summary>Wander idle cooldown ID</summary>
         private int _wanderTimerID = AICooldownManager.GetHash("WanderTimer");
 
+        ///<summary>Guard for first time initialisation</summary>
+        private bool _initialised = false;
+
+        ///<summary>Reference for wander points</summary>
+        private Dictionary<StateMachineContext, Vector3> _initialPositions = new Dictionary<StateMachineContext, Vector3>();
+
         ///<summary>Gets a random wander point within specified ranges</summary>
         ///<param name="context">Entity context</param>
         ///<returns>Target destination with y = 0</returns>
         public Vector3 GetWanderPoint(StateMachineContext context) {
             context.CooldownManager.Get(_wanderTimerID).Reset(Random.Range(_minWanderTime, _maxWanderTime));
-            return _initialPosition + (Random.insideUnitCircle * _maxRange).ToXZ();
+            return _initialPositions[context] + (Random.insideUnitCircle * _maxRange).ToXZ();
         }
 
         ///<summary>Used for first time initialisation</summary>
         public void Init() {
-            _initialPosition = transform.position;
+            if (_initialised) {
+                return;
+            }
+
+            _initialised = true;
         }
 
         ///<summary>OnEnter call propagated from state</summary>
@@ -56,6 +65,12 @@ namespace AI.Injectors {
         ///<returns>True if new wander point is needed</returns>
         public bool NextWanderPoint(StateMachineContext context) {
             return context.CooldownManager.Get(_wanderTimerID).IsFinished;
+        }
+
+        ///<summary>Used for first initialisation per object using the injector</summary>
+        ///<param name="context">Entity context</param>
+        public void ContextInit(StateMachineContext context) {
+            _initialPositions.Add(context, context.Position);
         }
     }
 }
