@@ -100,6 +100,7 @@ namespace AI.Examples {
         }
 
     }
+
     [Serializable]
     public class ManagerStateDefinitions : IStateDefinition {
         public void InitInjectors(StateMachineContext ctx) {
