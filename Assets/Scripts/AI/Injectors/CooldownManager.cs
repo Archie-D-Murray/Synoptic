@@ -73,6 +73,11 @@ namespace AI {
         public int CreateCooldown(float time, string name, bool managed = false) {
             if (name == string.Empty) { name = $"[{_cooldowns.Count}] Cooldown"; }
             int id = GetHash(name);
+
+            if (_cooldownIDs.ContainsKey(id)) {
+                return id;
+            }
+
             _cooldowns.Add(new AICooldown(name, id, time, managed));
             _cooldownIDs.Add(id, _cooldowns.Count - 1);
 

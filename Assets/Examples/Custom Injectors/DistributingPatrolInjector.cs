@@ -1,3 +1,4 @@
+#if AI_EXAMPLES
 using System;
 using System.Collections.Generic;
 
@@ -167,3 +168,5 @@ namespace AI.Examples {
         public void ContextInit(StateMachineContext context) { }
     }
 }
+
+#endif

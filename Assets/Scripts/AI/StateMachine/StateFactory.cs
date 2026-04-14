@@ -1,5 +1,9 @@
 using UnityEngine;
 
+#if AI_EXAMPLES
+using AI.Examples;
+#endif
+
 namespace AI.HSM {
     public class StateFactory {
 
@@ -28,6 +32,9 @@ namespace AI.HSM {
                 AIState.Chase => new ChaseState(_context, _stateMachine, parent),
                 AIState.Attack => new AttackState(_context, _stateMachine, parent),
                 AIState.Dead => new DeadState(_context, _stateMachine, parent),
+#if AI_EXAMPLES
+                AIState.Ranged => new RangedState(_context, _stateMachine, parent),
+#endif
                 _ => null
             };
         }

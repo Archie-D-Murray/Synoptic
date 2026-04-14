@@ -39,6 +39,24 @@ namespace AI.Adapters {
     ///</code>
     ///</example>
     ///</summary>
+
+    [System.Serializable]
+    public class AttackContext {
+        public Vector3 Origin;
+        public Vector3 Direction;
+        public AnimationClip Clip;
+        public StateMachineContext Entity;
+        public State State;
+
+        public AttackContext(StateMachineContext context) {
+            Entity = context;
+            State = null;
+            Clip = null;
+            Direction = Vector3.zero;
+            Origin = Vector3.zero;
+        }
+    }
+
     [System.Serializable]
     public abstract class AttackAdaptor {
         [SerializeField] protected float _normalizedTime;
@@ -49,15 +67,15 @@ namespace AI.Adapters {
         ///<remarks>Could be used to do something like a phyics cast or process ColliderCollector results</remarks>
         ///<param name="clip">Most weighted clip currently playing - used if actual attack time is needed</param>
         ///<param name="context">Entity that attack was called from</param>
-        public abstract void OnEvent(AnimationClip clip, StateMachineContext context);
+        public abstract void OnEvent(AttackContext context);
     }
 
     ///<summary>Attack that just logs an attack has happened at the start of an attack</summary>
     [System.Serializable]
     public class NullAttackAdapter : AttackAdaptor {
 
-        public override void OnEvent(AnimationClip clip, StateMachineContext context) {
-            Debug.Log($"[Attack Adapter (Object: {context.name})]: Null attack adapter called");
+        public override void OnEvent(AttackContext context) {
+            Debug.Log($"[Attack Adapter (Object: {context.Entity.name})]: Null attack adapter called");
         }
     }
 }

@@ -71,5 +71,12 @@ namespace Utilities {
                 }
             }
         }
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void OnBeginPlay() {
+            _internalInstance = null;
+        }
+#endif
     }
 }

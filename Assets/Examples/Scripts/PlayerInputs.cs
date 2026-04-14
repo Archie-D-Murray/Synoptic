@@ -1,10 +1,11 @@
+#if AI_EXAMPLES
+
 using System;
 
 using UnityEngine;
+
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-
-using Utilities;
 #endif
 
 namespace AI.Examples {
@@ -124,3 +125,5 @@ namespace AI.Examples {
         }
     }
 }
+
+#endif

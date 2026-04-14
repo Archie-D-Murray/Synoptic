@@ -111,8 +111,9 @@ namespace AI.Injectors {
 
         ///<summary>Whether entity is in range to start attacking</summary>
         ///<param name="context">Entity context</param>
-        ///<returns>Target is within attack range</returns>
-        public bool InAttackRange(StateMachineContext context);
+        ///<param name="attackRange">Attack range</param>
+        ///<returns>Target is within attack range specified</returns>
+        public bool InAttackRange(StateMachineContext context, float attackRange);
     }
 
     public interface IAttackInjector : IStateInjector {
@@ -131,6 +132,11 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>Attack Time of entity associated with context</returns>
         public float AttackTime(StateMachineContext context);
+
+        ///<summary>Gets attack range of entity associated with context</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>Attack range of entity associated with context</returns>
+        public float AttackRange(StateMachineContext context);
 
         ///<summary>Gets attacks for entities using injector</summary>
         ///<param name="context">Entity context</param>

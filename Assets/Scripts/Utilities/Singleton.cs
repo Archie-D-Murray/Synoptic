@@ -6,6 +6,7 @@ namespace Utilities {
     [DefaultExecutionOrder(-99)]
     public class Singleton<T> : MonoBehaviour where T : Component {
 
+
         ///<summary>Internal writable instance</summary>
         protected static T _internalInstance;
 
@@ -70,5 +71,12 @@ namespace Utilities {
                 }
             }
         }
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void OnBeinPlay() {
+            _internalInstance = null;
+        }
+#endif
     }
 }

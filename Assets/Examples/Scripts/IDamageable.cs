@@ -1,3 +1,5 @@
+#if AI_EXAMPLES
+
 using System;
 
 using UnityEngine;
@@ -51,3 +53,5 @@ namespace AI.Examples {
         public DamageResult Damage(DamageSource source);
     }
 }
+
+#endif

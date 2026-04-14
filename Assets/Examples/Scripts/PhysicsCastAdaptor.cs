@@ -1,7 +1,8 @@
+#if AI_EXAMPLES
+
 using UnityEngine;
 
 using AI.Adapters;
-using AI.HSM;
 
 namespace AI.Examples {
 
@@ -23,13 +24,14 @@ namespace AI.Examples {
             _layer = layer;
         }
 
-        public override void OnEvent(AnimationClip clip, StateMachineContext context) {
-            foreach (Collider hit in Physics.OverlapSphere(context.Position, _range, _layer)) {
-                if (hit.transform != context.transform && hit.TryGetComponent(out IDamageable damageable)) {
-                    damageable.Damage(new DamageSource(_damage, context.gameObject, hit.gameObject));
+        public override void OnEvent(AttackContext context) {
+            foreach (Collider hit in Physics.OverlapSphere(context.Origin, _range, _layer)) {
+                if (hit.transform != context.Entity.transform && hit.TryGetComponent(out IDamageable damageable)) {
+                    damageable.Damage(new DamageSource(_damage, context.Entity.gameObject, hit.gameObject));
                 }
             }
         }
     }
-
 }
+
+#endif

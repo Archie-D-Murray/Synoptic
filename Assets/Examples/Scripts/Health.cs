@@ -1,3 +1,5 @@
+#if AI_EXAMPLES
+
 using System;
 
 using UnityEngine;
@@ -64,3 +66,5 @@ namespace AI.Examples {
         }
     }
 }
+
+#endif

@@ -16,8 +16,14 @@ namespace AI.Injectors {
         ///<summary>Attack range for all entities using injector</summary>
         [SerializeField] private float _attackRange;
 
+        ///<summary>Attack cooldown - probably should be replaced with something else</summary>
+        [SerializeField] private float _attackTime = 1.0f;
+
+        ///<summary>Name of attack cooldown</summary>
+        [SerializeField] private string _attackCooldown = "Attack";
+
         ///<summary>Attack cooldown ID</summary>
-        private static int _attackCD = AICooldownManager.GetHash("Attack");
+        private int _attackCooldownID;
 
         ///<summary>Guard for first time initialisation</summary>
         private bool _initialised = false;
@@ -33,7 +39,7 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>IsFinished value of attack timer cooldown</returns>
         public bool CanAttack(StateMachineContext context) {
-            return context.CooldownManager.Get(_attackCD).IsFinished;
+            return context.CooldownManager.Get(_attackCooldownID).IsFinished;
         }
 
         ///<summary>OnEnter call propagated from state</summary>
@@ -48,7 +54,7 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<param name="dt">Time since last state machine update</param>
         public void OnUpdate(StateMachineContext context, float dt) {
-            context.CooldownManager.Get(_attackCD).Update(dt);
+            context.CooldownManager.Get(_attackCooldownID).Update(dt);
         }
 
         ///<summary>Used for first time initialisation</summary>
@@ -57,6 +63,7 @@ namespace AI.Injectors {
                 return;
             }
 
+            _attackCooldownID = AICooldownManager.GetHash(_attackCooldown);
             _initialised = true;
         }
 
@@ -64,14 +71,21 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<returns>Attack Time of entity associated with context</returns>
         public float AttackTime(StateMachineContext context) {
-            return context.CooldownManager.Get(_attackCD).InitialTime;
+            return context.CooldownManager.Get(_attackCooldownID).InitialTime;
+        }
+
+        ///<summary>Gets attack time of entity associated with context</summary>
+        ///<param name="context">Entity context</param>
+        ///<returns>Attack Time of entity associated with context</returns>
+        public float AttackRange(StateMachineContext context) {
+            return _attackRange;
         }
 
         ///<summary>Restarts attack cooldown as attack has occurred</summary>
         ///<param name="context">Entity context</param>
         public void RestartAttackCooldown(StateMachineContext context) {
-            context.CooldownManager.Get(_attackCD).Reset();
-            context.CooldownManager.Get(_attackCD).Start();
+            context.CooldownManager.Get(_attackCooldownID).Reset();
+            context.CooldownManager.Get(_attackCooldownID).Start();
         }
 
         ///<summary>Is the target too far to attack or no target found</summary>
@@ -83,6 +97,8 @@ namespace AI.Injectors {
 
         ///<summary>Used for first initialisation per object using the injector</summary>
         ///<param name="context">Entity context</param>
-        public void ContextInit(StateMachineContext context) { }
+        public void ContextInit(StateMachineContext context) {
+            _attackCooldownID = context.CooldownManager.CreateCooldown(_attackTime, _attackCooldown);
+        }
     }
 }

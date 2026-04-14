@@ -9,9 +9,6 @@ namespace AI.Injectors {
         ///<summary>Chase range before signaling to give up chase</summary>
         [SerializeField] private float _chaseRange;
 
-        ///<summary>Range to signal to switch to attacking</summary>
-        [SerializeField] private float _attackRange;
-
         private bool _initialised = false;
 
         ///<summary>Attack cooldown ID</summary>
@@ -57,8 +54,8 @@ namespace AI.Injectors {
         ///<summary>Whether entity is in range to start attacking</summary>
         ///<param name="context">Entity context</param>
         ///<returns>Target is within attack range</returns>
-        public bool InAttackRange(StateMachineContext context) {
-            return context.Detector.TargetPosition.InRange(context.Position, _attackRange) && context.Detector.HasTarget();
+        public bool InAttackRange(StateMachineContext context, float attackRange) {
+            return context.Detector.TargetPosition.InRange(context.Position, attackRange) && context.Detector.HasTarget();
         }
 
         ///<summary>Used for first initialisation per object using the injector</summary>

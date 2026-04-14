@@ -1,3 +1,5 @@
+#if AI_EXAMPLES
+
 using System;
 
 using AI.HSM;
@@ -16,13 +18,27 @@ namespace AI.Examples {
         [SerializeField] public IPatrolInjector Patrol;
         [SerializeField] public IChaseInjector Chase;
         [SerializeField] public IAttackInjector Attack;
+        [SerializeField] public IAttackInjector Ranged;
 
         private void OnValidate() {
             Idle = GetComponent<IIdleInjector>();
             Wander = GetComponent<IWanderInjector>();
             Patrol = GetComponent<IPatrolInjector>();
             Chase = GetComponent<IChaseInjector>();
-            Attack = GetComponent<IAttackInjector>();
+            IAttackInjector[] attackInjectors = GetComponents<IAttackInjector>();
+
+            if (attackInjectors.Length == 0) {
+                return;
+            }
+
+            if (attackInjectors.Length == 2) {
+                int first = attackInjectors[0].AttackRange(null) < attackInjectors[1].AttackRange(null) ? 0 : 1;
+                Attack = attackInjectors[first++];
+                Ranged = attackInjectors[first];
+            } else {
+                Attack = attackInjectors[0];
+                Ranged = attackInjectors[0];
+            }
         }
 
         protected override void OnAwake() {
@@ -31,6 +47,7 @@ namespace AI.Examples {
             Patrol.Init();
             Chase.Init();
             Attack.Init();
+            Ranged.Init();
         }
     }
 
@@ -84,7 +101,13 @@ namespace AI.Examples {
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],
                 ctx[AIState.Attack],
-                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx)));
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackRange)));
+
+            // Chase
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Chase],
+                ctx[AIState.Ranged],
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.RangedRange)));
 
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],
@@ -97,8 +120,22 @@ namespace AI.Examples {
                 ctx[AIState.Chase],
                 new LambdaPredicate(() => ctx.AttackInjector.UnableToAttack(ctx)));
 
-        }
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Attack],
+                ctx[AIState.Ranged],
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.RangedRange) && !ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackRange)));
 
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Ranged],
+                ctx[AIState.Chase],
+                new LambdaPredicate(() => !ctx.ChaseInjector.InAttackRange(ctx, ctx.RangedRange)));
+
+            ctx.StateMachine.AddStateTransition(
+                ctx[AIState.Ranged],
+                ctx[AIState.Attack],
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackRange)));
+
+        }
     }
 
     [Serializable]
@@ -150,7 +187,7 @@ namespace AI.Examples {
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],
                 ctx[AIState.Attack],
-                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx)));
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackRange)));
 
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],
@@ -166,3 +203,5 @@ namespace AI.Examples {
         }
     }
 }
+
+#endif

@@ -4,11 +4,9 @@ using System.Linq;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Adapters {
 
-    public enum AIAnimationType { None, Locomotion, Attack, Dead }
+    public enum AIAnimationType { None, Locomotion, Attack, Ranged, Dead }
     public enum AIAnimationParam { X, Y, Z, Speed, Crouch }
 
     [Serializable]

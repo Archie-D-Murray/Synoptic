@@ -26,7 +26,7 @@ namespace AI.HSM {
         public List<StateNode> Children;
     }
 
-#if AI_ROOT_PROJECT
+#if AI_EXAMPLES
     ///<summary>Base context for the state machine</summary>
     ///<summary>Add references to things like an enemy script here to use in states/injectors</summary>
     public partial class StateMachineContext : MonoBehaviour {
@@ -39,6 +39,7 @@ namespace AI.HSM {
         public AnimationAdapter Animator;
         public StateMachine StateMachine;
         public DetectorAdapter Detector;
+        public AttackContext AttackContext;
         public AICooldownManager CooldownManager = new AICooldownManager(new AICooldown[] {
             new AICooldown("WaitTime", 1.0f, false),
             new AICooldown("WanderTimer", 4.0f, false),
@@ -98,6 +99,7 @@ namespace AI.HSM {
             Animator = GetComponentInChildren<AnimationAdapter>();
             Movement = GetComponentInChildren<MovementAdapter>();
             Detector = GetComponentInChildren<DetectorAdapter>();
+            AttackContext.Entity = this;
             CheckInjectorsOnSameObject();
         }
 
@@ -157,11 +159,6 @@ namespace AI.HSM {
                 visited.Add(view.Key, 1);
             }
             this[view.Key] = factory.Create(view.Key, this[view.Parent]);
-        }
-
-        ///<summary>Provides all transitions to state machine after injectors are initialised</summary>
-        ///<summary>Use IStateDefinitionOverride to override this behaviour</summary>
-        private void DefaultTransitions() {
         }
 
         ///<summary>Updates state machine</summary>
@@ -238,7 +235,7 @@ namespace AI.HSM {
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],
                 ctx[AIState.Attack],
-                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx)));
+                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackInjector.AttackRange(ctx))));
 
             ctx.StateMachine.AddStateTransition(
                 ctx[AIState.Chase],

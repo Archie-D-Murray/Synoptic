@@ -1,3 +1,5 @@
+#if AI_EXAMPLES
+
 using System;
 
 using Utilities;
@@ -235,3 +237,5 @@ namespace AI.Examples {
         }
     }
 }
+
+#endif

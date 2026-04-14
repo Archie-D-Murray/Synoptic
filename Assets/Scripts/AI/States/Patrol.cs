@@ -1,3 +1,4 @@
+using AI.Adapters;
 using AI.HSM;
 
 namespace AI {
@@ -36,7 +37,7 @@ namespace AI {
                 _patrolIndex = _context.PatrolInjector.Next(_context, _patrolIndex);
                 _context.Movement.SetDestination(_context.PatrolInjector.GetPatrolTarget(_context, _patrolIndex));
             }
-            _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
+            _context.Animator.SetFloat(AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
         ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>
