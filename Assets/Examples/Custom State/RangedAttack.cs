@@ -6,11 +6,11 @@ using AI.Adapters;
 using AI.HSM;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 using Utilities;
 
 namespace AI.Examples {
+
     public class RangedState : State {
 
         protected readonly StateMachineContext _context;
@@ -18,17 +18,12 @@ namespace AI.Examples {
         protected bool _isAttacking = false;
         protected float _elapsedAttackTime = 0.0f;
 
-        Image _image;
-
         public RangedState(StateMachineContext context, StateMachine stateMachine, State parent) : base(stateMachine, parent) {
             _context = context;
         }
 
         protected override void OnEnter() {
             _context.RangedInjector.OnEnter(_context);
-            if (!_image) {
-                _image = _context.GetComponentInChildren<Image>();
-            }
 
             _context.AttackContext.State = this;
             _context.AttackContext.Origin = _context.Position.Offset(y: 1.5f);
@@ -43,7 +38,6 @@ namespace AI.Examples {
             if (_context.RangedInjector.CanAttack(_context)) {
                 _attacks.Clear();
                 _isAttacking = true;
-                _image.fillAmount = 0.0f;
                 _context.Animator.Play(AIAnimationType.Ranged);
                 _context.RangedInjector.RestartAttackCooldown(_context);
                 _context.Movement.SetDestination(_context.Position);
@@ -61,7 +55,6 @@ namespace AI.Examples {
 
             float normalizedAttackTime = _elapsedAttackTime / _context.RangedInjector.AttackTime(_context);
             if (_isAttacking) {
-                _image.fillAmount = normalizedAttackTime;
                 // Handle any pending attacks
                 _elapsedAttackTime += dt;
                 if (_attacks.Count > 0) {

@@ -26,7 +26,8 @@ namespace AI.Examples {
 
         public override void OnEvent(AttackContext context) {
             foreach (Collider hit in Physics.OverlapSphere(context.Origin, _range, _layer)) {
-                if (hit.transform != context.Entity.transform && hit.TryGetComponent(out IDamageable damageable)) {
+                if (hit.transform == context.Entity.transform) { continue; }
+                if (hit.TryGetComponent(out IDamageable damageable)) {
                     damageable.Damage(new DamageSource(_damage, context.Entity.gameObject, hit.gameObject));
                 }
             }

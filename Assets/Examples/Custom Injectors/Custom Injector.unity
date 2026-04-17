@@ -212,6 +212,12 @@ MonoBehaviour:
   _targetSpeed: 0
   _target: {x: 0, y: 0, z: 0}
   _hasTarget: 0
+  _grounded: 0
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 63
+  _velocity: {x: 0, y: 0, z: 0}
+  _obstacleAvoidanceRays: 8
 --- !u!114 &171047832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,9 +272,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttackRange: 5
+  RangedRange: 7.5
+  RangedMovementLockout: 0.5
   Movement: {fileID: 171047831}
   Animator: {fileID: 171047832}
   Detector: {fileID: 1470490121}
+  AttackContext:
+    Origin: {x: 0, y: 0, z: 0}
+    Direction: {x: 0, y: 0, z: 0}
+    Clip: {fileID: 0}
+    Entity: {fileID: 171047835}
   CooldownManager:
     _cooldowns:
     - Name: WaitTime
@@ -310,18 +323,18 @@ MonoBehaviour:
   _definition:
     rid: 831756598388719779
   _states:
-  - Key: 1
+  - Key: 7
     Parent: 0
-  - Key: 2
-    Parent: 1
-  - Key: 3
-    Parent: 1
   - Key: 4
-    Parent: 1
-  - Key: 5
-    Parent: 1
+    Parent: 7
   - Key: 6
-    Parent: 1
+    Parent: 7
+  - Key: 5
+    Parent: 7
+  - Key: 2
+    Parent: 7
+  - Key: 1
+    Parent: 7
   references:
     version: 2
     RefIds:
@@ -539,6 +552,8 @@ MonoBehaviour:
   - rid: 831756593855463774
   - rid: 831756593855463776
   _attackRange: 1
+  _attackTime: 1
+  _attackCooldown: Attack
   references:
     version: 2
     RefIds:
@@ -568,7 +583,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chaseRange: 2
-  _attackRange: 1
 --- !u!114 &878350597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,6 +624,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a999c0c90a721e7418829876c0ad6bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _showPatrolPointsDebug: 0
   _currentPatrols: []
   _patrolPoints:
   - {x: 10, y: 0, z: 10}
@@ -1278,9 +1293,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttackRange: 5
+  RangedRange: 7.5
+  RangedMovementLockout: 0.5
   Movement: {fileID: 1351377581}
   Animator: {fileID: 1351377582}
   Detector: {fileID: 1509472954}
+  AttackContext:
+    Origin: {x: 0, y: 0, z: 0}
+    Direction: {x: 0, y: 0, z: 0}
+    Clip: {fileID: 0}
+    Entity: {fileID: 1351377580}
   CooldownManager:
     _cooldowns:
     - Name: WaitTime
@@ -1322,18 +1344,18 @@ MonoBehaviour:
   _definition:
     rid: 831756598388719780
   _states:
-  - Key: 1
+  - Key: 7
     Parent: 0
-  - Key: 2
-    Parent: 1
-  - Key: 3
-    Parent: 1
   - Key: 4
-    Parent: 1
-  - Key: 5
-    Parent: 1
+    Parent: 7
   - Key: 6
-    Parent: 1
+    Parent: 7
+  - Key: 5
+    Parent: 7
+  - Key: 2
+    Parent: 7
+  - Key: 1
+    Parent: 7
   references:
     version: 2
     RefIds:
@@ -1361,6 +1383,12 @@ MonoBehaviour:
   _targetSpeed: 0
   _target: {x: 0, y: 0, z: 0}
   _hasTarget: 0
+  _grounded: 0
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 63
+  _velocity: {x: 0, y: 0, z: 0}
+  _obstacleAvoidanceRays: 8
 --- !u!114 &1351377582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1989,9 +2017,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttackRange: 5
+  RangedRange: 7.5
+  RangedMovementLockout: 0.5
   Movement: {fileID: 1610040339}
   Animator: {fileID: 1610040340}
   Detector: {fileID: 1858220724}
+  AttackContext:
+    Origin: {x: 0, y: 0, z: 0}
+    Direction: {x: 0, y: 0, z: 0}
+    Clip: {fileID: 0}
+    Entity: {fileID: 1610040338}
   CooldownManager:
     _cooldowns:
     - Name: WaitTime
@@ -2033,18 +2068,18 @@ MonoBehaviour:
   _definition:
     rid: 831756598388719781
   _states:
-  - Key: 1
+  - Key: 7
     Parent: 0
-  - Key: 2
-    Parent: 1
-  - Key: 3
-    Parent: 1
   - Key: 4
-    Parent: 1
-  - Key: 5
-    Parent: 1
+    Parent: 7
   - Key: 6
-    Parent: 1
+    Parent: 7
+  - Key: 5
+    Parent: 7
+  - Key: 2
+    Parent: 7
+  - Key: 1
+    Parent: 7
   references:
     version: 2
     RefIds:
@@ -2072,6 +2107,12 @@ MonoBehaviour:
   _targetSpeed: 0
   _target: {x: 0, y: 0, z: 0}
   _hasTarget: 0
+  _grounded: 0
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 2147483583
+  _velocity: {x: 0, y: 0, z: 0}
+  _obstacleAvoidanceRays: 8
 --- !u!114 &1610040340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2675,9 +2716,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AttackRange: 5
+  RangedRange: 7.5
+  RangedMovementLockout: 0.5
   Movement: {fileID: 2125306434}
   Animator: {fileID: 2125306435}
   Detector: {fileID: 992407226}
+  AttackContext:
+    Origin: {x: 0, y: 0, z: 0}
+    Direction: {x: 0, y: 0, z: 0}
+    Clip: {fileID: 0}
+    Entity: {fileID: 2125306433}
   CooldownManager:
     _cooldowns:
     - Name: WaitTime
@@ -2719,18 +2767,18 @@ MonoBehaviour:
   _definition:
     rid: 831756598388719782
   _states:
-  - Key: 1
+  - Key: 7
     Parent: 0
-  - Key: 2
-    Parent: 1
-  - Key: 3
-    Parent: 1
   - Key: 4
-    Parent: 1
-  - Key: 5
-    Parent: 1
+    Parent: 7
   - Key: 6
-    Parent: 1
+    Parent: 7
+  - Key: 5
+    Parent: 7
+  - Key: 2
+    Parent: 7
+  - Key: 1
+    Parent: 7
   references:
     version: 2
     RefIds:
@@ -2758,6 +2806,12 @@ MonoBehaviour:
   _targetSpeed: 0
   _target: {x: 0, y: 0, z: 0}
   _hasTarget: 0
+  _grounded: 0
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 2147483583
+  _velocity: {x: 0, y: 0, z: 0}
+  _obstacleAvoidanceRays: 8
 --- !u!114 &2125306435
 MonoBehaviour:
   m_ObjectHideFlags: 0

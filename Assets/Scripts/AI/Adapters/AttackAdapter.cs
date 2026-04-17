@@ -65,8 +65,7 @@ namespace AI.Adapters {
 
         ///<summary>Called when normalized attack duration reaches <c>NormalizedTime</c></summary>
         ///<remarks>Could be used to do something like a phyics cast or process ColliderCollector results</remarks>
-        ///<param name="clip">Most weighted clip currently playing - used if actual attack time is needed</param>
-        ///<param name="context">Entity that attack was called from</param>
+        ///<param name="context">Attack Context for event</param>
         public abstract void OnEvent(AttackContext context);
     }
 

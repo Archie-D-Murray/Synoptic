@@ -177,6 +177,7 @@ namespace AI.HSM {
     }
 
     public interface IStateDefinition {
+        public void InitFactory(StateFactory factory) { }
         public void InitInjectors(StateMachineContext context);
         public void InitTransitions(StateMachineContext context);
     }
@@ -253,6 +254,7 @@ namespace AI.HSM {
 
     [Serializable]
     public class StationaryEnemyDefinition : IStateDefinition {
+
         public void InitInjectors(StateMachineContext ctx) {
             ctx.IdleInjector = ctx.GetComponentInChildren<IIdleInjector>();
             ctx.AttackInjector = ctx.GetComponentInChildren<IAttackInjector>();

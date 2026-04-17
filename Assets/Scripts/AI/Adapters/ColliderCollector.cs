@@ -19,7 +19,8 @@ namespace AI.Adapters {
         [SerializeField] private bool _debug;
         [SerializeField] private List<Collider> _colliders;
 
-        private Func<GameObject, bool> _targetFilter;
+        private Func<GameObject, bool> _targetFilter = delegate { return true; };
+        private Action<GameObject> _onHitCallback = delegate { };
 
         private void Awake() {
             Transforms.EnsureCapacity(_defaultCapacity);
@@ -31,8 +32,17 @@ namespace AI.Adapters {
         ///<summary>Sets filter function for colliders - can be null</summary>
         ///<param name="filter">Function used in OnTriggerEnter to filter colliders</param>
         public void SetTargetFilter(Func<GameObject, bool> filter) {
-            if (filter == null) { return; }
             _targetFilter = filter;
+        }
+
+        ///<summary>Sets callback upon collecting new object</summary>
+        ///<param name="callback">Callback to invoke - null will disable callback</param>
+        public void SetOnHitCallback(Action<GameObject> callback) {
+            if (callback == null) {
+                _onHitCallback = delegate { };
+            } else {
+                _onHitCallback = callback;
+            }
         }
 
         ///<summary>Enables collection</summary>
@@ -82,10 +92,19 @@ namespace AI.Adapters {
             }
         }
 
+        private bool IsValidObject(GameObject obj) {
+            if (_targetFilter == null) {
+                return true;
+            } else {
+                return _targetFilter.Invoke(obj);
+            }
+        }
+
         private void OnTriggerEnter(Collider collider) {
-            if (_allowCollection && (_mask.value & 1 << collider.gameObject.layer) > 0 && (_targetFilter?.Invoke(collider.gameObject) ?? true) && !Transforms.Contains(collider.transform)) {
+            if (_allowCollection && (_mask.value & 1 << collider.gameObject.layer) > 0 && IsValidObject(collider.gameObject) && !Transforms.Contains(collider.transform)) {
                 Transforms.Add(collider.transform);
                 Colliders.Add(collider);
+                _onHitCallback.Invoke(collider.gameObject);
                 if (_debug) {
                     _colliders.Add(collider);
                 }

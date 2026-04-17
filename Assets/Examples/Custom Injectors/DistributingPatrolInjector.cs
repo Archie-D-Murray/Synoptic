@@ -7,8 +7,6 @@ using AI.Injectors;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace AI.Examples {
 
     ///<summary>Randomly wanders to locations within range of reference and waits for random range of time</summary>
@@ -35,6 +33,8 @@ namespace AI.Examples {
         }
 
         private int _nextPatrolIndex = 0;
+
+        [SerializeField] private bool _showPatrolPointsDebug = false;
 
         [SerializeField] Patrol[] _currentPatrols;
         Dictionary<StateMachineContext, int> _contextToPos;
@@ -166,6 +166,19 @@ namespace AI.Examples {
         ///<summary>Used for first initialisation per object using the injector</summary>
         ///<param name="context">Entity context</param>
         public void ContextInit(StateMachineContext context) { }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos() {
+            if (!_showPatrolPointsDebug) { return; }
+            Color prev = Gizmos.color;
+            Gizmos.color = Color.grey;
+            foreach (Vector3 point in _patrolPoints) {
+                Gizmos.DrawSphere(point, 0.5f);
+            }
+
+            Gizmos.color = prev;
+        }
+#endif
     }
 }
 

@@ -53,6 +53,11 @@ namespace AI.Examples {
 
     [Serializable]
     public class DistributedStateDefinitions : IStateDefinition {
+
+        public void InitFactory(StateFactory factory) {
+            factory.AddStateDefinition(new StateFactoryDefinition(AIState.Ranged, StateCreators.CreateRanged));
+        }
+
         public void InitInjectors(StateMachineContext ctx) {
             ctx.IdleInjector = InjectorManager.Instance.Idle;
             ctx.WanderInjector = InjectorManager.Instance.Wander;
@@ -140,6 +145,7 @@ namespace AI.Examples {
 
     [Serializable]
     public class ManagerStateDefinitions : IStateDefinition {
+
         public void InitInjectors(StateMachineContext ctx) {
             ctx.IdleInjector = InjectorManager.Instance.Idle;
             ctx.WanderInjector = InjectorManager.Instance.Wander;
