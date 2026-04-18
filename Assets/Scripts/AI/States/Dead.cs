@@ -3,6 +3,7 @@ using AI.HSM;
 namespace AI {
 
     ///<summary>A blank state to stop any transitions moving out of the current state</summary>
+    [System.Serializable]
     public class DeadState : State {
 
         protected readonly StateMachineContext _context;

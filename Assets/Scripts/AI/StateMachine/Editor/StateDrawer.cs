@@ -1,16 +1,18 @@
 #if UNITY_EDITOR
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
+
+using AI.HSM;
 
 using System.Reflection;
 using System.Linq;
-using AI.Adapters;
 using System.Collections.Generic;
 using System;
 
-[CustomPropertyDrawer(typeof(AttackAdaptor), true)]
-public class AttackAdaptorEditor : PropertyDrawer {
+[CustomPropertyDrawer(typeof(State), true)]
+public class StateDrawer : PropertyDrawer {
+
     const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
     private static readonly Dictionary<Type, FieldInfo[]> _fieldCache = new Dictionary<Type, FieldInfo[]>();

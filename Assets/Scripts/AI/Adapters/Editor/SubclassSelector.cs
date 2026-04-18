@@ -10,7 +10,6 @@ using UnityEditor.UIElements;
 
 
 using UnityEditor;
-using AI.Adapters;
 
 // [CustomPropertyDrawer(typeof(AttackAdaptor))]
 // public class AttackAdapterDrawer : PropertyDrawer {

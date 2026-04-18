@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace AI {
     ///<summary>Used for chasing an enemy when are still seen but out of range to attack</summary>
+    [System.Serializable]
     public class ChaseState : State {
 
         protected readonly StateMachineContext _context;

@@ -4,10 +4,11 @@ using AI.HSM;
 namespace AI {
 
     ///<summary>Moves along a set of patrol points waiting for a specified duration at each point</summary>
+    [System.Serializable]
     public class PatrolState : State {
 
         protected readonly StateMachineContext _context;
-        protected int _patrolIndex = 0;
+        [UnityEngine.SerializeField] protected int _patrolIndex = 0;
 
         public PatrolState(StateMachineContext context, StateMachine stateMachine, State parent) : base(stateMachine, parent) {
             _context = context;

@@ -5,6 +5,7 @@ using AI.HSM;
 
 namespace AI {
     ///<summary>Used for attacking enemies that are in range</summary>
+    [System.Serializable]
     public class AttackState : State {
 
         protected readonly StateMachineContext _context;

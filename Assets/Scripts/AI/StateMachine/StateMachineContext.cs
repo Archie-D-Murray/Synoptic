@@ -48,9 +48,7 @@ namespace AI.HSM {
             new AICooldown("Attack", 1.0f, false),
         });
 
-        [SerializeField] private string _statePath;
-
-        [SerializeReference, SubclassSelector] private IStateDefinition _definition = new DefaultStateDefinitions();
+        [SerializeReference, SubclassSelector] private IStateDefinition _definition = new AI.Examples.RangedStateDefinition();
 
         public IIdleInjector IdleInjector;
         public IWanderInjector WanderInjector;
@@ -113,6 +111,9 @@ namespace AI.HSM {
 
             StateMachine = new StateMachine();
             StateFactory factory = new StateFactory(StateMachine, this);
+
+            _definition.InitFactory(factory);
+
             StateMachine.SetRoot(factory.Create(AIState.Root, null));
 
             foreach (AIStateView view in _states) {
@@ -167,7 +168,6 @@ namespace AI.HSM {
             float dt = Time.deltaTime;
             CooldownManager.Update(dt);
             StateMachine.Tick(dt);
-            _statePath = string.Join(" > ", StateMachine.Root.GetLeaf().PathToRoot().Reverse());
         }
 
         ///<summary>Forwards FixedUpdate to state machine</summary>

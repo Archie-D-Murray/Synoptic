@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace AI.HSM {
-
+    [Serializable]
     public abstract class State {
         public readonly StateMachine StateMachine;
         public readonly State Parent;
         public State ActiveChild;
-        public float cost = 0;
 
         protected State(StateMachine stateMachine, State parent) {
             StateMachine = stateMachine;

@@ -11,6 +11,7 @@ using Utilities;
 
 namespace AI.Examples {
 
+    [System.Serializable]
     public class RangedState : State {
 
         protected readonly StateMachineContext _context;

@@ -2,6 +2,7 @@ using AI.HSM;
 
 namespace AI {
     ///<summary>Idles for a set time before signalling for a state change</summary>
+    [System.Serializable]
     public class IdleState : State {
 
         protected readonly StateMachineContext _context;
