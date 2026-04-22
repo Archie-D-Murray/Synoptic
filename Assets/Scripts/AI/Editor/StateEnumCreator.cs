@@ -66,7 +66,9 @@ public class StateEnumCreator {
         hasNewStates = found.RemoveWhere(state => !valid.Contains(state)) > 0;
 
         foreach (string newState in valid) {
-            found.Add(newState);
+            if (found.Add(newState)) {
+                hasNewStates = true;
+            }
         }
 
         Debug.Log($"Validated States:\nValid: {string.Join(separator, valid)}\nFound: {string.Join(separator, found)}");

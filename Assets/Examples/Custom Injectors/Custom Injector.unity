@@ -319,7 +319,6 @@ MonoBehaviour:
         _time: 0
         _isRunning: 0
       Managed: 0
-  _statePath: 
   _definition:
     rid: 831756598388719779
   _states:
@@ -510,10 +509,10 @@ GameObject:
   - component: {fileID: 878350593}
   - component: {fileID: 878350598}
   - component: {fileID: 878350597}
-  - component: {fileID: 878350599}
   - component: {fileID: 878350595}
   - component: {fileID: 878350594}
   - component: {fileID: 878350600}
+  - component: {fileID: 878350601}
   m_Layer: 0
   m_Name: Injectors
   m_TagString: Untagged
@@ -551,6 +550,7 @@ MonoBehaviour:
   _attacks:
   - rid: 831756593855463774
   - rid: 831756593855463776
+  - rid: 8997842918087327808
   _attackRange: 1
   _attackTime: 1
   _attackCooldown: Attack
@@ -570,6 +570,17 @@ MonoBehaviour:
       type: {class: NullAttackAdapter, ns: AI.Adapters, asm: Assembly-CSharp}
       data:
         _normalizedTime: 0
+    - rid: 8997842918087327808
+      type: {class: RangedAttackAdaptor, ns: AI.Examples, asm: Assembly-CSharp}
+      data:
+        _normalizedTime: 0
+        _projectile: {fileID: 0}
+        _mask:
+          serializedVersion: 2
+          m_Bits: 0
+        _damage: 4
+        _lifeTime: 5
+        _speed: 5
 --- !u!114 &878350595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,9 +621,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b261e8e3b6dcdb242b133498df124257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minIdleTime: 5
-  _maxIdleTime: 15
---- !u!114 &878350599
+  _minIdleTime: 1
+  _maxIdleTime: 1
+--- !u!114 &878350600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878350592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3bc5f88219cf74098c1b2fccb7cd74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &878350601
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -632,18 +655,6 @@ MonoBehaviour:
   - {x: -10, y: 0, z: -10}
   - {x: -10, y: 0, z: 10}
   _targetDistance: 0.5
---- !u!114 &878350600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 878350592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc3bc5f88219cf74098c1b2fccb7cd74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &992407223
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1340,7 +1351,6 @@ MonoBehaviour:
         _time: 0
         _isRunning: 0
       Managed: 0
-  _statePath: 
   _definition:
     rid: 831756598388719780
   _states:
@@ -2064,7 +2074,6 @@ MonoBehaviour:
         _time: 0
         _isRunning: 0
       Managed: 0
-  _statePath: 
   _definition:
     rid: 831756598388719781
   _states:
@@ -2110,7 +2119,7 @@ MonoBehaviour:
   _grounded: 0
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 2147483583
+    m_Bits: 63
   _velocity: {x: 0, y: 0, z: 0}
   _obstacleAvoidanceRays: 8
 --- !u!114 &1610040340
@@ -2763,7 +2772,6 @@ MonoBehaviour:
         _time: 0
         _isRunning: 0
       Managed: 0
-  _statePath: 
   _definition:
     rid: 831756598388719782
   _states:
@@ -2809,7 +2817,7 @@ MonoBehaviour:
   _grounded: 0
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 2147483583
+    m_Bits: 63
   _velocity: {x: 0, y: 0, z: 0}
   _obstacleAvoidanceRays: 8
 --- !u!114 &2125306435
