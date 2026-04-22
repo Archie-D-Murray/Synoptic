@@ -320,7 +320,6 @@ MonoBehaviour:
         _time: 0
         _isRunning: 0
       Managed: 0
-  _statePath: 
   _definition:
     rid: 831756593855463506
   _states:
@@ -515,7 +514,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attacks:
   - rid: 831756593855463774
-  - rid: 831756593855463776
+  - rid: 8997842874958872577
   _attackRange: 1
   _attackTime: 1
   _attackCooldown: Attack
@@ -531,7 +530,7 @@ MonoBehaviour:
           serializedVersion: 2
           m_Bits: 8
         _damage: 5
-    - rid: 831756593855463776
+    - rid: 8997842874958872577
       type: {class: NullAttackAdapter, ns: AI.Adapters, asm: Assembly-CSharp}
       data:
         _normalizedTime: 0
