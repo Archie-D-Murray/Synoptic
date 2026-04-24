@@ -644,11 +644,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 878350592}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a999c0c90a721e7418829876c0ad6bec, type: 3}
+  m_Script: {fileID: 11500000, guid: a5e1788f249f11d46b6b0e8310dbc89a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _showPatrolPointsDebug: 0
-  _currentPatrols: []
   _patrolPoints:
   - {x: 10, y: 0, z: 10}
   - {x: 10, y: 0, z: -10}
