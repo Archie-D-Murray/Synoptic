@@ -84,7 +84,7 @@ namespace AI.Injectors {
         ///<summary>Restarts attack cooldown as attack has occurred</summary>
         ///<param name="context">Entity context</param>
         public void RestartAttackCooldown(StateMachineContext context) {
-            context.CooldownManager.Get(_attackCooldownID).Reset();
+            context.CooldownManager.Get(_attackCooldownID).Reset(_attackTime);
             context.CooldownManager.Get(_attackCooldownID).Start();
         }
 

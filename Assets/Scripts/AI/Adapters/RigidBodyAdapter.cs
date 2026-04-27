@@ -59,7 +59,7 @@ namespace AI.Adapters {
                 AvoidObstacles(ref movement);
             }
 
-            if (movement.WithY(0).sqrMagnitude >= 0.01f) {
+            if (movement.WithY(0).sqrMagnitude >= 1f) {
                 transform.rotation = Quaternion.RotateTowards(
                         transform.rotation,
                         Quaternion.LookRotation(movement.WithY(0).normalized, Vector3.up),
@@ -106,7 +106,6 @@ namespace AI.Adapters {
 
                 if (distance <= 0.01f) {
                     _rb.linearVelocity = Vector3.zero;
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation((_target - _rb.position).WithY(0).normalized, Vector3.up), _turnSpeed * Time.fixedDeltaTime);
                     return Vector3.zero;
                 }
 
