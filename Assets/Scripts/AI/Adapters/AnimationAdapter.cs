@@ -42,7 +42,7 @@ namespace AI.Adapters {
             _animator = GetComponentInChildren<Animator>();
             _animLookup = new Dictionary<AIAnimationType, int>(_animations.Length);
             foreach (Animation anim in _animations) {
-                if (anim.StateName.Trim() == string.Empty) {
+                if (anim.Layer.Trim() == string.Empty) {
                     _animLookup.Add(anim.AnimationType, Animator.StringToHash(anim.StateName));
                 } else {
                     _animLookup.Add(anim.AnimationType, Animator.StringToHash($"{anim.Layer}.{anim.StateName}"));
