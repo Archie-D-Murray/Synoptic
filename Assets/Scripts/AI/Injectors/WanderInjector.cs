@@ -31,6 +31,7 @@ namespace AI.Injectors {
         ///<returns>Target destination with y = 0</returns>
         public Vector3 GetWanderPoint(StateMachineContext context) {
             context.CooldownManager.Get(_wanderTimerID).Reset(Random.Range(_minWanderTime, _maxWanderTime));
+            context.CooldownManager.Get(_wanderTimerID).Start();
             return _initialPositions[context] + (Random.insideUnitCircle * _maxRange).ToXZ();
         }
 
@@ -55,7 +56,7 @@ namespace AI.Injectors {
         ///<param name="context">Entity context</param>
         ///<param name="dt">Time since last state machine update</param>
         public void OnUpdate(StateMachineContext context, float dt) {
-            if (Vector3.Distance(context.Movement.Target, context.Position) <= 0.5f && !context.CooldownManager.Get(_wanderTimerID).IsRunning) {
+            if (Vector3.Distance(context.Movement.Target, context.Position) <= 0.5f && context.CooldownManager.Get(_wanderTimerID).IsRunning) {
                 context.CooldownManager.Get(_wanderTimerID).Update(dt);
             }
         }

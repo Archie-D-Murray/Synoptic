@@ -10,7 +10,11 @@ using Utilities;
 public class TimerDrawer : PropertyDrawer {
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
         // 2 fields + progress bar + spacing
-        return (EditorGUIUtility.singleLineHeight * 3) + 8;
+        if (property.FindPropertyRelative("_initialTime").floatValue >= 0.5f) {
+            return (EditorGUIUtility.singleLineHeight * 3) + 8;
+        } else {
+            return (EditorGUIUtility.singleLineHeight * 2) + 8;
+        }
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -34,12 +38,18 @@ public class TimerDrawer : PropertyDrawer {
         EditorGUI.PropertyField(initialRect, initialTime);
         EditorGUI.PropertyField(remainingRect, remainingTime);
 
+        if (initialTime.floatValue < 0.5f) {
+            EditorGUI.EndProperty();
+            return;
+        }
+
         // Calculate progress
         float init = initialTime.floatValue;
         float remain = remainingTime.floatValue;
 
         float progress = 1f;
         if (init > 0f) { progress = Mathf.Clamp01(1f - (remain / init)); }
+
 
 
         // Draw progress bar

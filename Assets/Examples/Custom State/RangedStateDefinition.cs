@@ -1,35 +1,19 @@
 #if AI_EXAMPLES
+using System.Collections.Generic;
+
 using AI.HSM;
 
 namespace AI.Examples {
 
-    public class TempStateDefinition : IStateDefinition {
-
-        public void InitInjectors(StateMachineContext ctx) { }
-
-        public void InitTransitions(StateMachineContext ctx) {
-            ctx.StateMachine.AddInitialState(ctx[AIState.Root], ctx[AIState.Idle]);
-
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Idle],
-                ctx[AIState.Wander],
-                new AndPredicate(
-                    new LambdaPredicate(() => ctx.IdleInjector.DoneIdling(ctx)),
-                    new RandomChancePredicate(0.5f)));
-
-            float range = ctx.AttackInjector.AttackRange(ctx);
-
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Attack],
-                ctx[AIState.Patrol],
-                new OrPredicate(
-                    new LambdaPredicate(() => ctx.Detector.JustLostTarget),
-                    new NotPredicate(
-                        new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, range)))));
-        }
-    }
-
     public class RangedStateDefinition : IStateDefinition {
+        
+        public IEnumerable<AIState> RequiredStates() {
+            foreach (AIState state in StateDefinitions.BasicStates) {
+                yield return state;
+            }
+
+            yield return AIState.Ranged;
+        }
 
         public void InitFactory(StateFactory factory) {
             factory.AddStateDefinition(new StateFactoryDefinition(AIState.Ranged, StateCreators.CreateRanged));

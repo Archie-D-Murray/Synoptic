@@ -17,6 +17,16 @@ namespace AI.HSM {
         public AIState Parent;
         [HideInInspector]
         public State State = null;
+
+        public AIStateView() {
+            Key = AIState.Root;
+            Parent = AIState.None;
+        }
+
+        public AIStateView(AIState state, AIState parent) {
+            Key = state;
+            Parent = parent;
+        }
     }
 
     class StateNode {
@@ -48,7 +58,7 @@ namespace AI.HSM {
             new AICooldown("Attack", 1.0f, false),
         });
 
-        [SerializeReference, SubclassSelector] private IStateDefinition _definition = new AI.Examples.RangedStateDefinition();
+        [SerializeReference, SubclassSelector] private IStateDefinition _definition = StateMachineContext.GetDefault();
 
         public IIdleInjector IdleInjector;
         public IWanderInjector WanderInjector;
@@ -56,18 +66,6 @@ namespace AI.HSM {
         public IChaseInjector ChaseInjector;
         public IAttackInjector AttackInjector;
         public Vector3 Position => transform.position;
-
-        private bool _injectorsOnSameObj = false;
-
-        private void CheckInjectorsOnSameObject() {
-            foreach (Transform child in transform) {
-                if (child.gameObject.GetComponent<IIdleInjector>() != null) {
-                    _injectorsOnSameObj = child.GetComponents<IStateInjector>().Length == this.GetType().GetFields().Where(field => field.GetType().IsAssignableFrom(typeof(IStateInjector))).Count();
-                    return;
-                }
-            }
-            _injectorsOnSameObj = false;
-        }
 
         [SerializeField] private AIStateView[] _states = new AIStateView[] { new AIStateView() { Key = AIState.Root, Parent = AIState.None } };
         private Dictionary<AIState, int> _lookup = new Dictionary<AIState, int>();
@@ -94,11 +92,31 @@ namespace AI.HSM {
         }
 
         private void OnValidate() {
-            Animator = GetComponentInChildren<AnimationAdapter>();
-            Movement = GetComponentInChildren<MovementAdapter>();
-            Detector = GetComponentInChildren<DetectorAdapter>();
-            AttackContext.Entity = this;
-            CheckInjectorsOnSameObject();
+            if (!Animator) { Animator = GetComponentInChildren<AnimationAdapter>(); }
+            if (!Movement) { Movement = GetComponentInChildren<MovementAdapter>(); }
+            if (!Detector) { Detector = GetComponentInChildren<DetectorAdapter>(); }
+            if (AttackContext == null) {
+                AttackContext = new AttackContext(this);
+            } else {
+                AttackContext.Entity = this; 
+            }
+            if (_definition != null) {
+                HashSet<AIState> tempLookup = new HashSet<AIState>(_states.Length);
+                foreach (AIStateView view in _states) {
+                    tempLookup.Add(view.Key);
+                }
+
+                int oldSize = _states.Count();
+                IEnumerable<AIState> toAdd = _definition.RequiredStates().Where(state => !tempLookup.Contains(state));
+                Array.Resize(ref _states, _states.Length + toAdd.Count());
+                for (int i = oldSize; i < _states.Length; i++) {
+                    if (toAdd.ElementAt(i - oldSize) == AIState.Root) {
+                        _states[i] = new AIStateView(AIState.Root, AIState.None);
+                    } else {
+                        _states[i] = new AIStateView(toAdd.ElementAt(i - oldSize), AIState.Root);
+                    }
+                }
+            }
         }
 
         private void Awake() {
@@ -174,110 +192,13 @@ namespace AI.HSM {
         private void FixedUpdate() {
             StateMachine.FixedTick();
         }
-    }
 
-    public interface IStateDefinition {
-        public void InitFactory(StateFactory factory) { }
-        public void InitInjectors(StateMachineContext context);
-        public void InitTransitions(StateMachineContext context);
-    }
-
-    [Serializable]
-    public class DefaultStateDefinitions : IStateDefinition {
-        public void InitInjectors(StateMachineContext ctx) {
-            ctx.IdleInjector = ctx.GetComponentInChildren<IIdleInjector>();
-            ctx.WanderInjector = ctx.GetComponentInChildren<IWanderInjector>();
-            ctx.PatrolInjector = ctx.GetComponentInChildren<IPatrolInjector>();
-            ctx.ChaseInjector = ctx.GetComponentInChildren<IChaseInjector>();
-            ctx.AttackInjector = ctx.GetComponentInChildren<IAttackInjector>();
-            ctx.IdleInjector.Init();
-            ctx.WanderInjector.Init();
-            ctx.PatrolInjector.Init();
-            ctx.ChaseInjector.Init();
-            ctx.AttackInjector.Init();
-            ctx.IdleInjector.ContextInit(ctx);
-            ctx.WanderInjector.ContextInit(ctx);
-            ctx.PatrolInjector.ContextInit(ctx);
-            ctx.ChaseInjector.ContextInit(ctx);
-            ctx.AttackInjector.ContextInit(ctx);
-        }
-
-        public void InitTransitions(StateMachineContext ctx) {
-            ctx.StateMachine.AddInitialState(ctx[AIState.Root], ctx[AIState.Idle]);
-            // Idle
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Idle],
-                ctx[AIState.Wander],
-                new AndPredicate(new LambdaPredicate(() => ctx.IdleInjector.DoneIdling(ctx)), new RandomChancePredicate(0.5f)));
-
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Idle],
-                ctx[AIState.Patrol],
-                new AndPredicate(new LambdaPredicate(() => ctx.IdleInjector.DoneIdling(ctx)), new RandomChancePredicate(0.5f)));
-
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Idle],
-                ctx[AIState.Chase],
-                new LambdaPredicate(ctx.Detector.HasTarget));
-
-            // Wander
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Wander],
-                ctx[AIState.Chase],
-                new LambdaPredicate(ctx.Detector.HasTarget));
-
-            // Patrol
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Patrol],
-                ctx[AIState.Chase],
-                new LambdaPredicate(ctx.Detector.HasTarget));
-
-            // Chase
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Chase],
-                ctx[AIState.Attack],
-                new LambdaPredicate(() => ctx.ChaseInjector.InAttackRange(ctx, ctx.AttackInjector.AttackRange(ctx))));
-
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Chase],
-                ctx[AIState.Idle],
-                new LambdaPredicate(() => ctx.ChaseInjector.LostTarget(ctx)));
-
-            // Attack
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Attack],
-                ctx[AIState.Chase],
-                new LambdaPredicate(() => ctx.AttackInjector.UnableToAttack(ctx)));
-
-        }
-    }
-
-    [Serializable]
-    public class StationaryEnemyDefinition : IStateDefinition {
-
-        public void InitInjectors(StateMachineContext ctx) {
-            ctx.IdleInjector = ctx.GetComponentInChildren<IIdleInjector>();
-            ctx.AttackInjector = ctx.GetComponentInChildren<IAttackInjector>();
-            ctx.IdleInjector.Init();
-            ctx.AttackInjector.Init();
-            ctx.IdleInjector.ContextInit(ctx);
-            ctx.AttackInjector.ContextInit(ctx);
-        }
-
-        public void InitTransitions(StateMachineContext ctx) {
-            ctx.StateMachine.AddInitialState(ctx[AIState.Root], ctx[AIState.Idle]);
-            // Idle
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Idle],
-                ctx[AIState.Attack],
-                new LambdaPredicate(() => ctx.Detector.HasTarget()));
-
-            // Attack
-            ctx.StateMachine.AddStateTransition(
-                ctx[AIState.Attack],
-                ctx[AIState.Idle],
-                new LambdaPredicate(() => ctx.Detector.JustLostTarget));
-
+        private static IStateDefinition GetDefault() {
+#if AI_EXAMPLES
+            return new AI.Examples.RangedStateDefinition();
+#else
+            return new DefaultStateDefinitions();
+#endif
         }
     }
 }
