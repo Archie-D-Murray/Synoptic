@@ -39,7 +39,7 @@ Root:
 ![Player Setup](./Share/Player_Setup.png)
 
 ## Enemy Setup
-Enemies are a little more complicated with a few extra components providing adaptors allowing functionality to be overriden. They have a `StateMachineContext` providing the state machine references and states, this must have it's states field configured with all desired states - make sure to configure these! The state machine also uses a state definition to allow the user to define its transitions conditions and add any custom states to the state factory which is used to build the state tree at runtime.
+Enemies are a little more complicated with a few extra components providing adaptors allowing functionality to be overriden. They have a `StateMachineContext` providing the state machine references and states, this must have it's states field intialised with all desired states - make sure to configure these! The state machine also uses a state definition to allow the user to define its transitions conditions and add any custom states to the state factory which is used to build the state tree at runtime. This example uses the `ManagerStateDefinitions` as it is from the other examples but others may use different state defintiions as needed.
 
 ![State Machine Context](./Share/States_Machine_Context.png)
 
@@ -58,7 +58,7 @@ Root:
 ```
 
 ## Injector Setup
-Injectors all sit on a single `InjectorManager` singleton that provides an easy way to supply entities with injector references, this would likely need to be extracted to provide per enemy type injectors but it simplifies setup for the example massively.
+In the basic scene, injectors sit on a child object `Injectors` to make it as simple as possible, however in the other example an injector manager is used to allow entities to reuse their injectors. The following screenshot is on the manager but is exactly the same on the children in the basic scene
 
 ![Injectors](./Share/Injectors.png)
 
