@@ -92,6 +92,26 @@ namespace AI.HSM {
         }
     }
 
+    ///<summary>Evaluates a random chance once per frame - can be used in multiple transitions</summary>
+    public class StableChancePredicate : IPredicate {
+        private readonly float _chance;
+        private int _lastFrame = 0;
+        private bool _result = false;
+
+        public StableChancePredicate(float chance) {
+            _chance = chance;
+        }
+
+        public bool Evaluate() {
+            if (UnityEngine.Time.frameCount > _lastFrame) {
+                _lastFrame = UnityEngine.Time.frameCount;
+                _result = UnityEngine.Random.value <= _chance;
+            }
+
+            return _result;
+        }
+    }
+
     ///<summary>Evaluates a collection of predicates as a cascade (only true if all are true)</summary>
     public class CascadePredicate : IPredicate {
         private IPredicate[] _predicates;
