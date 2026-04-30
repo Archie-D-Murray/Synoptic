@@ -67,7 +67,7 @@ Injectors all sit on a single `InjectorManager` singleton that provides an easy 
 ## Custom Injector
 To make entities patrol across all patrol points and spread themselves out over available nodes a new `DistributedPatrolInjector` was created to provide this behaviour. The class uses the same implementation as the `CyclePatrolInjector` with a store listing which entities have a certain patrol point allowing them to keep track of which point they are currently at. This was done by modifying the `GetStartIndex`, `Next` and `Prev` methods along with `OnEnter` and `OnExit` removing them from the store.
 
-[Distributed Patrol Injector class]("./Assets/Examples/Custom%20Injectors/DistributingPatrolInjector.cs")
+[Distributed Patrol Injector class](./Assets/Examples/Custom%20Injectors/DistributingPatrolInjector.cs)
 
 ```cs
 // _contextToPos: Dictionary<StateMachineContext, int> - Maps context to current patrol target index
@@ -165,7 +165,7 @@ public class RangedProjectile : MonoBehaviour {
     }
 }
 ```
-[Ranged Projectile full class]("./Assets/Examples/Custom%20State/RangedProjectile.cs")
+[Ranged Projectile full class](./Assets/Examples/Custom%20State/RangedProjectile.cs)
 
 ![Ranged Attack Adaptor + Injector](./Share/Ranged_Injector_Manager.png)
 
@@ -178,7 +178,7 @@ public class RangedState : State { /* Empty for now */ }
 
 This state re-uses a significant amount of the base [Attack State](./Assets/Scripts/AI/States/Attack.cs) however it must use a different injector having the slight modification of being able to move once a large enough portion of the attack animation is complete to allow the enemy to attempt to close in on its target and eventually switch to melee attacks
 
-[Ranged State]("./Assets/Examples/Custom%20State/RangedAttack.cs")
+[Ranged State](./Assets/Examples/Custom%20State/RangedAttack.cs)
 ```cs
 // RangedState::OnUpdate()
 OnUpdate(float dt) {
