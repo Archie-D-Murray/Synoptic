@@ -1,5 +1,8 @@
 # Synoptic Project Evaluation
 
+## User Evaluation
+User feedback has been gathered through a clone of this repo with some files moved around to ease users into the project and some template code for the tasks. The repo is available at [GitHub link](https://github.com/Archie-D-Murray/Synoptic-Evaluation-Template)
+
 ## State Machine
 The core of the state machine handles updating and transitioning states including proper exit of states before entering the new state, finding the path to the new state and resolving the entering and exiting of states along the path. States contain basic methods like `OnUpdate()`, `OnEnter()` and `OnExit()` which can be implemented in custom state types, with the state machine calling the methods for it. Data flows in a couple of different ways:
  - Entity specific state data that does not need to accessed via anything other than the state and maybe an injector should stay in the state type
