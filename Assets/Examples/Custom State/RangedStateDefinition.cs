@@ -5,8 +5,9 @@ using AI.HSM;
 
 namespace AI.Examples {
 
+    ///<summary>Extended ranged definition for an entity that idles then either wanders or patrols and chases enemies attacking if in range or using ranged attacks if not in melee range</summary>
     public class RangedStateDefinition : IStateDefinition {
-        
+
         public IEnumerable<AIState> RequiredStates() {
             foreach (AIState state in StateDefinitions.BasicStates) {
                 yield return state;

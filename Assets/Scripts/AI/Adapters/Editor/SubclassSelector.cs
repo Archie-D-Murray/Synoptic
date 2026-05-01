@@ -38,9 +38,9 @@ using UnityEditor;
 public class SubclassSelectorPropertyDrawer : PropertyDrawer {
 
     public override VisualElement CreatePropertyGUI(SerializedProperty property) {
-        var visualElement = new VisualElement();
+        VisualElement visualElement = new VisualElement();
 
-        var propertyField = new PropertyField();
+        PropertyField propertyField = new PropertyField();
         propertyField.BindProperty(property);
         propertyField.label = " ";
 
@@ -49,9 +49,9 @@ public class SubclassSelectorPropertyDrawer : PropertyDrawer {
             return visualElement;
         }
 
-        var types = GetTypes(fieldInfo, property);
+        List<Type> types = GetTypes(fieldInfo, property);
 
-        var dropdownField = new TypePopupField(property, types);
+        TypePopupField dropdownField = new TypePopupField(property, types);
         visualElement.Add(dropdownField);
 
         visualElement.Add(propertyField);
@@ -72,7 +72,7 @@ public class SubclassSelectorPropertyDrawer : PropertyDrawer {
     }
 
     private static List<Type> GetTypes(FieldInfo fieldInfo, SerializedProperty property) {
-        var value = property.managedReferenceValue;
+        object value = property.managedReferenceValue;
         Type currentType = value?.GetType();
 
         Type fieldType = fieldInfo.FieldType;
@@ -80,7 +80,7 @@ public class SubclassSelectorPropertyDrawer : PropertyDrawer {
 
         bool isCollection = IsCollection(fieldType);
 
-        var types = new List<Type>() { currentType, null };
+        List<Type> types = new List<Type>() { currentType, null };
 
         if (!fieldType.IsAbstract && !isCollection) {
             types.Add(fieldType);
@@ -95,8 +95,8 @@ public class SubclassSelectorPropertyDrawer : PropertyDrawer {
             baseType = fieldType;
         }
 
-        var derivedTypes = TypeCache.GetTypesDerivedFrom(baseType);
-        foreach (var derivedType in derivedTypes) {
+        TypeCache.TypeCollection derivedTypes = TypeCache.GetTypesDerivedFrom(baseType);
+        foreach (Type derivedType in derivedTypes) {
             types.Add(derivedType);
         }
 
@@ -119,9 +119,9 @@ public class SubclassSelectorPropertyDrawer : PropertyDrawer {
                 _property.managedReferenceValue = null;
                 _property.serializedObject.ApplyModifiedProperties();
             } else {
-                var constructor = selectedType.GetConstructor(Type.EmptyTypes);
+                ConstructorInfo constructor = selectedType.GetConstructor(Type.EmptyTypes);
                 if (constructor != null) {
-                    var value = constructor.Invoke(null);
+                    object value = constructor.Invoke(null);
                     _property.managedReferenceValue = value;
                     _property.serializedObject.ApplyModifiedProperties();
                 } else {

@@ -10,7 +10,7 @@ using UnityEngine;
 using Utilities;
 
 namespace AI.HSM {
-
+    ///<summary>States represented in editor - state is initialised on start</summary>
     [Serializable]
     public class AIStateView {
         public AIState Key;
@@ -27,13 +27,6 @@ namespace AI.HSM {
             Key = state;
             Parent = parent;
         }
-    }
-
-    class StateNode {
-        public StateNode Parent;
-        public State Value;
-        public AIState Type;
-        public List<StateNode> Children;
     }
 
 #if AI_EXAMPLES
@@ -91,6 +84,7 @@ namespace AI.HSM {
             }
         }
 
+        ///<summary>Performs necessary validation logic whenever component is creator or modified in inspector</summary>
         private void OnValidate() {
             if (!Animator) { Animator = GetComponentInChildren<AnimationAdapter>(); }
             if (!Movement) { Movement = GetComponentInChildren<MovementAdapter>(); }
@@ -98,7 +92,7 @@ namespace AI.HSM {
             if (AttackContext == null) {
                 AttackContext = new AttackContext(this);
             } else {
-                AttackContext.Entity = this; 
+                AttackContext.Entity = this;
             }
             if (_definition != null) {
                 HashSet<AIState> tempLookup = new HashSet<AIState>(_states.Length);
@@ -193,6 +187,7 @@ namespace AI.HSM {
             StateMachine.FixedTick();
         }
 
+        ///<summary>Gets default state definition - called when object is created</summary>
         private static IStateDefinition GetDefault() {
 #if AI_EXAMPLES
             return new AI.Examples.RangedStateDefinition();

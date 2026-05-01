@@ -17,7 +17,7 @@ namespace AI {
             _context = context;
         }
 
-        ///<summary>Propagates OnEnter to injector</summary>
+        ///<summary>Propagates OnEnter to injector and sets attack context</summary>
         protected override void OnEnter() {
             _context.AttackInjector.OnEnter(_context);
             _context.Animator.Play(AIAnimationType.Attack);
@@ -31,6 +31,8 @@ namespace AI {
         ///<param name="dt">Time since last update - used to update attack duration and queued attacks</param>
         protected override void OnUpdate(float dt) {
             _context.AttackInjector.OnUpdate(_context, dt);
+            _context.AttackContext.Origin = _context.Position.Offset(y: 1.5f);
+            _context.AttackContext.Direction = (_context.Detector.TargetPosition - _context.Position).WithY(0).normalized;
 
             // Can this entity attack?
             if (_context.AttackInjector.CanAttack(_context)) {
@@ -66,7 +68,7 @@ namespace AI {
             _context.Animator.SetFloat(Adapters.AIAnimationParam.Speed, _context.Movement.NormalizedSpeed);
         }
 
-        ///<summary>Stops any movement from move adaptor + propagates OnExit to injector</summary>
+        ///<summary>Moves back to locomotion animation + propagates OnExit to injector</summary>
         protected override void OnExit() {
             _context.AttackInjector.OnExit(_context);
             _context.Animator.Play(AIAnimationType.Locomotion);

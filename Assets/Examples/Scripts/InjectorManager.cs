@@ -32,9 +32,10 @@ namespace AI.Examples {
             }
 
             if (attackInjectors.Length == 2) {
-                int first = attackInjectors[0].AttackRange(null) < attackInjectors[1].AttackRange(null) ? 0 : 1;
-                Attack = attackInjectors[first++];
-                Ranged = attackInjectors[first];
+                int index = attackInjectors[0].AttackRange(null) < attackInjectors[1].AttackRange(null) ? 0 : 1;
+                Attack = attackInjectors[index];
+                index = ++index % 2;
+                Ranged = attackInjectors[index];
             } else {
                 Attack = attackInjectors[0];
                 Ranged = attackInjectors[0];

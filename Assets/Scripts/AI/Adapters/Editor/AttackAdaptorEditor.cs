@@ -57,15 +57,15 @@ public class AttackAdaptorEditor : PropertyDrawer {
     }
 
     ///<summary>This is fairly nasty - try to cache reflection info where possible</summary>
-    ///<param name="reference">Non null ref to object (will error out if null)</param>
+    ///<param name="reference">Ref to object, returns empty array on null</param>
     ///<returns>Array of properties in reverse order as for some reason they are backwards...</returns>
     private SerializedProperty[] GetProps(SerializedProperty reference) {
         object obj = reference.managedReferenceValue;
         if (obj == null) return Array.Empty<SerializedProperty>();
 
-        var type = obj.GetType();
+        Type type = obj.GetType();
 
-        if (!_fieldCache.TryGetValue(type, out var fields)) {
+        if (!_fieldCache.TryGetValue(type, out FieldInfo[] fields)) {
             fields = type.GetFields(flags).Reverse().ToArray();
             _fieldCache[type] = fields;
         }

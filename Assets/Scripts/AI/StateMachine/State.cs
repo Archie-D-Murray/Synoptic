@@ -24,9 +24,9 @@ namespace AI.HSM {
         ///<returns>Null if staying in current state or new state to move to</returns>
         protected virtual State GetTransition() {
             State transition = null;
-            if (StateMachine.StateTransitions.ContainsKey(this)) {
+            if (StateMachine.StateTransitions.ContainsKey(this)) { // May not have transitions for this state (Ex: Root)
                 foreach (TransitionCondition transitionCondition in StateMachine.StateTransitions.GetValueOrDefault(this)) {
-                    if (StateMachine.StatePath.Contains(transitionCondition.To)) { continue; }
+                    if (StateMachine.StatePath.Contains(transitionCondition.To)) { continue; } // Already in state in the state path
                     if (transitionCondition.Evaluate()) {
                         transition = transitionCondition.To;
                     }
